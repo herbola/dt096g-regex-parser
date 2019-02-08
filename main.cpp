@@ -5,6 +5,7 @@
 #include "header/token.h"
 #include "header/re.h"
 #include "header/simple_re.h"
+#include "header/substitute.h"
 
 
 
@@ -60,27 +61,47 @@ op* _simple_re(it first , it last) {
 }
 
 op* _substitute(it first, it last) {
-    token tk = next_token(first, last);
-
+    token simple_re_tk = next_token(first, last);
+    op* substitute_expr = new substitute;
+    op* simple_re_expr = _simple_re(first, last); //lhs
+    if(!simple_re_expr) {
+        std::cout<<"Syntax error in substitute, SIMPLE_RE\n";
+        return nullptr;
+    } else {
+        substitute_expr->operands.push_back(simple_re_expr);
+    }
     first++;
     token or_token = next_token(first, last);
-    if(or_token.id = tk.OR) {
-        std::cout<<"Error in substitute";
+    if(or_token.id = token::OR) {
+        std::cout<<"Syntax error in substitute, OR \n";
         return nullptr;
     }
+    first++;
+    token re_tk = next_token(first, last);
+    op* re_expr = new re;
+    re_expr = _re(first, last);
+    if(!re_expr) {
+        std::cout<<"Syntax error in substitute, RE\n";
+        return nullptr;
+    }
+    substitute_expr->operands.push_back(re_expr);
+    return substitute_expr;
 }
 
 op* _re(it first, it last) {
-    op* r = new re;
+    op* expr = new re;
     token tk = next_token(first, last);
 
-    op* simple_or_uninon = _simple_re(first, last);
-    if (simple_or_uninon) {
-
-    } else {
-        simple_or_uninon = _substitute(first, last);
+    op* simple_or_substitue= _simple_re(first, last);
+    if (!simple_or_substitue) {
+        simple_or_substitue= _substitute(first, last);
     }
-    return r;
+    if(!simple_or_substitue) {
+        std::cout<<"Syntax error in _re\n";
+        return nullptr;
+    }
+    expr->operands.push_back(simple_or_substitue);
+    return expr;
 }
 
 int main(int argc, char** argv) {
