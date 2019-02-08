@@ -3,31 +3,28 @@
 #include <string>
 #include "header/op.h"
 #include "header/token.h"
-#include <regex>
+#include "header/re.h"
+#include "header/simple_re.h"
 
 
-using it = std::string::iterator;
+
 
 /*
     
-<RE>	::=	<union> | <simple-RE>
-<union>	::=	<RE> "|" <simple-RE>
-<simple-RE>	::=	<concatenation> | <basic-RE>
-<concatenation>	::=	<simple-RE> <basic-RE>
-<basic-RE>	::=	<star> | <plus> | <elementary-RE>
-<star>	::=	<elementary-RE> "*"
-<plus>	::=	<elementary-RE> "+"
-<elementary-RE>	::=	<group> | <any> | <eos> | <char> | <set>
+<RE>	::=	<simple-RE> | <substitute> 
+<substitute>	::=	<simple-RE>  "|" <RE>
+<simple-RE>	::=	<basic-RE> |  concatenation> 
+<concatenation>	::=	<basic-RE> <simple-RE> 
+<basic-RE>	::=	 <elementary-RE> | <plus> | <star> 
+<star>	::=	<elementary-RE> "*" ändra sida
+<plus>	::=	<elementary-RE> "+"  ändra sida?
+<elementary-RE>	::=	<char> | <group> | <any> | <counter>
 <group>	::=	"(" <RE> ")"
+<count> ::= "{" <digit> "}"
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <any>	::=	"."
-<eos>	::=	"$"
-<char>	::=	any non metacharacter | "\" metacharacter
-<set>	::=	<positive-set> | <negative-set>
-<positive-set>	::=	"[" <set-items> "]"
-<negative-set>	::=	"[^" <set-items> "]"
-<set-items>	::=	<set-item> | <set-item> <set-items>
-<set-items>	::=	<range> | <char>
-<range>	::=	<char> "-" <char>
+<charachter>	::=	any non metacharacter | "\" metacharacter
+
 */
 
 
@@ -40,15 +37,58 @@ using it = std::string::iterator;
 \I ignorera versalisering. Syntax EXPR\I
 \O{} vilken infångningsgrupp som ska ges som output. Syntax: EXPR\O{2}. Default \O{0} hela matchningen.
 */
-op* program_parse(it first, it last) {
-    auto tk = next_token(first, last);
+using it = std::string::iterator;
+
+op* _re(it first, it last);
+op* _substitute(it first, it last);
+op* _simple_re(it first , it last);
+op* _concat(it first , it last);
+op* _basic_re(it first , it last);
+op* _star(it first , it last);
+op* _plus(it first , it last);
+op* _elementary_re(it first , it last);
+op* _group(it first , it last);
+op* _count(it first , it last);
+op* _digit(it first , it last);
+op* _character(it first , it last);
+op* _any(it first , it last);
+
+
+op* _simple_re(it first , it last) {
+    op* basic_re_or_concat = new simple_re;
+    token tk = next_token(first, last);
+}
+
+op* _substitute(it first, it last) {
+    token tk = next_token(first, last);
+
     first++;
+    token or_token = next_token(first, last);
+    if(or_token.id = tk.OR) {
+        std::cout<<"Error in substitute";
+        return nullptr;
+    }
+}
+
+op* _re(it first, it last) {
+    op* r = new re;
+    token tk = next_token(first, last);
+
+    op* simple_or_uninon = _simple_re(first, last);
+    if (simple_or_uninon) {
+
+    } else {
+        simple_or_uninon = _substitute(first, last);
+    }
+    return r;
 }
 
 int main(int argc, char** argv) {
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string input = "lo* could.{3}";
-    op* result = program_parse(input.begin(), input.end());
+    op* result = _re(input.begin(), input.end());
+    int stop;
+    std::cin>>stop;
     return 0;
 }
 

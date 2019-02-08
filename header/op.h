@@ -4,13 +4,10 @@
 #include <string>
 #include <vector>
 
-class op {
-public:
-    virtual std::string eval() = 0;
+struct op {
+    virtual char eval() = 0;
     virtual std::string id() = 0;
     std::vector<op*> operands;
-private:
-
 };
 
 #endif /* OP_H */
