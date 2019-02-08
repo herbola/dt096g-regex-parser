@@ -8,8 +8,9 @@
 #include "header/substitute.h"
 #include "header/basic_re.h"
 #include "header/concat.h"
-#include "header/elementary_re"
-
+#include "header/elementary_re.h"
+#include "header/plus.h"
+#include "header/star.h"
 
 
 /*
@@ -57,7 +58,7 @@ op* _character(it first , it last);
 op* _any(it first , it last);
 
 op* _star(it first, it last) {
-    op* elementary_re_expr = new elementary_re_expr;
+    op* elementary_re_expr = new elementary_re;
     elementary_re_expr = _elementary_re(first, last);
     if(!elementary_re_expr) {
         std::cout<<"Syntax error in _star, elementary_re_expr\n";
@@ -71,11 +72,11 @@ op* _star(it first, it last) {
     }
     op* expr = new star;
     expr->operands.push_back(elementary_re_expr);
-    return star;
+    return expr;
 }
 
 op* _plus(it first, it last) {
-    op* elementary_re_expr = new elementary_re_expr;
+    op* elementary_re_expr = new elementary_re;
     elementary_re_expr = _elementary_re(first, last);
     if(!elementary_re_expr) {
         std::cout<<"Syntax error in _plus, elementary_re_expr\n";
@@ -89,26 +90,26 @@ op* _plus(it first, it last) {
     }
     op* expr = new plus;
     expr->operands.push_back(elementary_re_expr);
-    return plus;
+    return expr;
 }
 op* _elementary_re(it first , it last) {
     op* char_group_any_counter = new elementary_re;
-    elementary_re = _character(first, first);
-    if(!elementary_re) {
-        elementary_re = _group(first, last);
-        if(!elementary_re) {
-            elementary_re = _any(first, last);
-            if(!elementary_re) {
-                elementary_re = _counter(first, last);
+    char_group_any_counter = _character(first, first);
+    if(!char_group_any_counter) {
+        char_group_any_counter = _group(first, last);
+        if(!char_group_any_counter) {
+            char_group_any_counter = _any(first, last);
+            if(!char_group_any_counter) {
+                char_group_any_counter = _counter(first, last);
             }
         }
     }
-    if(!elementary_re) {
+    if(!char_group_any_counter) {
         std::cout<<"Syntax error in _elementary_re\n";
         return nullptr;
     }
-    op* expr = new _elementary_re;
-    expr->operands.push_back(elementary_re);
+    op* expr = new elementary_re;
+    expr->operands.push_back(char_group_any_counter);
     return expr;
 }
 op* _concat(it first , it last) { // <concatenation> ::= <basic-RE> <simple-RE> 
