@@ -70,7 +70,7 @@ op* _character(it first, it last) { // <charachter>	::=	any non metacharacter | 
         return nullptr;
     }
     chr->_id = tk.text;
-    std::cout<<"\nHEWAHEAWHEHWEH"<<chr->id()<<"\n";
+
     return chr;
 }
 
@@ -179,7 +179,7 @@ op* _plus(it first, it last) { // <plus> ::= <elementary-RE> "+"
     return expr;
 }
 op* _elementary_re(it first , it last) { // <elementary-RE>	::=	<char> | <group> | <any> | <counter>
-    op* char_group_any_counter = _character(first, first);
+    op* char_group_any_counter = _character(first, last);
     if(!char_group_any_counter) {
         char_group_any_counter = _group(first, last);
         if(!char_group_any_counter) {
@@ -232,7 +232,7 @@ op* _basic_re(it first , it last) { // <basic-RE> ::= <elementary-RE> | <plus> |
     expr->operands.push_back(elem_or_star_or_plus);
     return expr;
 }
-op* _simple_re(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation> 
+op* _simple_re(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation>
     op* basic_re_or_concat = _basic_re(first, last);
     if(!basic_re_or_concat) {
         basic_re_or_concat = _concat(first, last);
@@ -285,10 +285,17 @@ op* _re(it first, it last) { // <RE> ::= <simple-RE> | <substitute>
     return expr;
 }
 
+void loop(op*& o){
+    std::cout<<o->id()<<std::endl;
+    for(auto e : o->operands) {
+        loop(e);
+    }
+}
 int main(int argc, char** argv) {
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string input = "lo* could.{3}";
     op* result = _re(input.begin(), input.end());
+    loop(result);
     int stop;
     std::cin>>stop;
     return 0;

@@ -1,5 +1,6 @@
 #include <string>
 #include <cctype>
+#include <algorithm>
 struct token {
 
     enum id {
@@ -26,7 +27,6 @@ token next_token(it& first, it& last) {
     while (std::isspace(*first)) {
         first++;
     }
-
     if( first == last) {
         return { token::END_PROGRAM, ""};
     }
