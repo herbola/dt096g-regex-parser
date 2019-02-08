@@ -51,16 +51,65 @@ op* _star(it first , it last);
 op* _plus(it first , it last);
 op* _elementary_re(it first , it last);
 op* _group(it first , it last);
-op* _count(it first , it last);
+op* _counter(it first , it last);
 op* _digit(it first , it last);
 op* _character(it first , it last);
 op* _any(it first , it last);
 
 op* _star(it first, it last) {
-
+    op* elementary_re_expr = new elementary_re_expr;
+    elementary_re_expr = _elementary_re(first, last);
+    if(!elementary_re_expr) {
+        std::cout<<"Syntax error in _star, elementary_re_expr\n";
+        return nullptr;
+    }
+    first++;
+    token tk = next_token(first, last);
+    if(tk.id != token::STAR) {
+        std::cout<<"Syntax error in _star, token::STAR\n";
+        return nullptr;
+    }
+    op* expr = new star;
+    expr->operands.push_back(elementary_re_expr);
+    return star;
 }
+
 op* _plus(it first, it last) {
-    
+    op* elementary_re_expr = new elementary_re_expr;
+    elementary_re_expr = _elementary_re(first, last);
+    if(!elementary_re_expr) {
+        std::cout<<"Syntax error in _plus, elementary_re_expr\n";
+        return nullptr;
+    }
+    first++;
+    token tk = next_token(first, last);
+    if(tk.id != token::PLUS) {
+        std::cout<<"Syntax error in _plus, token::PLUS\n";
+        return nullptr;
+    }
+    op* expr = new plus;
+    expr->operands.push_back(elementary_re_expr);
+    return plus;
+}
+op* _elementary_re(it first , it last) {
+    op* char_group_any_counter = new elementary_re;
+    elementary_re = _character(first, first);
+    if(!elementary_re) {
+        elementary_re = _group(first, last);
+        if(!elementary_re) {
+            elementary_re = _any(first, last);
+            if(!elementary_re) {
+                elementary_re = _counter(first, last);
+            }
+        }
+    }
+    if(!elementary_re) {
+        std::cout<<"Syntax error in _elementary_re\n";
+        return nullptr;
+    }
+    op* expr = new _elementary_re;
+    expr->operands.push_back(elementary_re);
+    return expr;
 }
 op* _concat(it first , it last) { // <concatenation> ::= <basic-RE> <simple-RE> 
     op* basic_re_expr = new basic_re;
