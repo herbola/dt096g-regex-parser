@@ -143,8 +143,8 @@ op* _basic_re(it first , it last) { // <basic-RE> ::= <elementary-RE> | <plus> |
        std::cout<<"Syntax error in _basic_re\n"; 
        return nullptr;
     }
-    op* expr = new _basic_re;
-    _basic_re->operands.push_back(elem_or_star_or_plus);
+    op* expr = new basic_re;
+    expr->operands.push_back(elem_or_star_or_plus);
     return expr;
 }
 op* _simple_re(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation> 
