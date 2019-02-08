@@ -6,7 +6,7 @@
 
 class op {
 public:
-    virtual double eval() = 0;
+    virtual std::string eval() = 0;
     virtual std::string id() = 0;
     std::vector<op*> operands;
 private:
