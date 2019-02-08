@@ -6,7 +6,9 @@
 #include "header/re.h"
 #include "header/simple_re.h"
 #include "header/substitute.h"
-
+#include "header/basic_re.h"
+#include "header/concat.h"
+#include "header/elementary_re"
 
 
 
@@ -17,7 +19,7 @@
 <simple-RE>	::=	<basic-RE> |  concatenation> 
 <concatenation>	::=	<basic-RE> <simple-RE> 
 <basic-RE>	::=	 <elementary-RE> | <plus> | <star> 
-<star>	::=	<elementary-RE> "*" ändra sida
+<star>	::=	<elementary-RE> "*" ändra sida?
 <plus>	::=	<elementary-RE> "+"  ändra sida?
 <elementary-RE>	::=	<char> | <group> | <any> | <counter>
 <group>	::=	"(" <RE> ")"
@@ -54,14 +56,63 @@ op* _digit(it first , it last);
 op* _character(it first , it last);
 op* _any(it first , it last);
 
+op* _star(it first, it last) {
 
-op* _simple_re(it first , it last) {
+}
+op* _plus(it first, it last) {
+    
+}
+op* _concat(it first , it last) { // <concatenation> ::= <basic-RE> <simple-RE> 
+    op* basic_re_expr = new basic_re;
+    basic_re_expr = _basic_re(first, last);
+    if(!basic_re_expr) {
+        std::cout<<"Syntax error in _concat, basic_re\n";
+        return nullptr;
+    }
+    first++;
+    op* simple_re_expr = new simple_re;
+    simple_re_expr = _simple_re(first, last);
+    if(!simple_re_expr) {
+        std::cout<<"Syntax error in _concat, simple_re\n";
+        return nullptr;
+    }
+    op* expr = new concat;
+    expr->operands.push_back(basic_re_expr);
+    expr->operands.push_back(simple_re_expr);
+    return expr;
+}
+op* _basic_re(it first , it last) { // <basic-RE> ::= <elementary-RE> | <plus> | <star> 
+    op* elem_or_star_or_plus = _elementary_re(first, last);
+    if(!elem_or_star_or_plus) {
+        elem_or_star_or_plus = _star(first, last);
+        if(!elem_or_star_or_plus) {
+          elem_or_star_or_plus = _plus(first, last);  
+        }
+    }
+    if(!elem_or_star_or_plus) {
+       std::cout<<"Syntax error in _basic_re\n"; 
+       return nullptr;
+    }
+    op* expr = new _basic_re;
+    _basic_re->operands.push_back(elem_or_star_or_plus);
+    return expr;
+}
+op* _simple_re(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation> 
     op* basic_re_or_concat = new simple_re;
-    token tk = next_token(first, last);
+    basic_re_or_concat = _basic_re(first, last);
+    if(!basic_re_or_concat) {
+        basic_re_or_concat = _concat(first, last);
+    }
+    if(!basic_re_or_concat) {
+        std::cout<<"Syntax error in _simple_re\n";
+        return nullptr;
+    }
+    op* expr = new simple_re;
+    expr->operands.push_back(basic_re_or_concat);
+    return expr;
 }
 
-op* _substitute(it first, it last) {
-    token simple_re_tk = next_token(first, last);
+op* _substitute(it first, it last) { // <substitute> ::= <simple-RE>  "|" <RE>
     op* substitute_expr = new substitute;
     op* simple_re_expr = _simple_re(first, last); //lhs
     if(!simple_re_expr) {
@@ -77,7 +128,6 @@ op* _substitute(it first, it last) {
         return nullptr;
     }
     first++;
-    token re_tk = next_token(first, last);
     op* re_expr = new re;
     re_expr = _re(first, last);
     if(!re_expr) {
@@ -88,10 +138,8 @@ op* _substitute(it first, it last) {
     return substitute_expr;
 }
 
-op* _re(it first, it last) {
+op* _re(it first, it last) { // <RE> ::= <simple-RE> | <substitute> 
     op* expr = new re;
-    token tk = next_token(first, last);
-
     op* simple_or_substitue= _simple_re(first, last);
     if (!simple_or_substitue) {
         simple_or_substitue= _substitute(first, last);
