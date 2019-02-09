@@ -20,7 +20,7 @@
 
 /*
     
-<RE>	::=	<simple-RE> | <substitute> 
+<RE>	::=	 <substitute> | <simple-RE> 
 <substitute>	::=	<simple-RE>  "|" <RE>
 <simple-RE>	::=	<basic-RE> |  concatenation> 
 <concatenation>	::=	<basic-RE> <simple-RE> 
@@ -66,11 +66,11 @@ op* _character(it first, it last) { // <charachter>	::=	any non metacharacter | 
     character* chr = new character;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
-        std::cout<<"Syntax error in _character\n";
+        std::cout<<"was not a character\n";
         return nullptr;
     }
     chr->_id = tk.text;
-
+    first++;
     return chr;
 }
 
@@ -86,7 +86,7 @@ op* _digit(it first, it last) { // <digit> ::= [0 - 9]
             return dig;
         }
     }
-    std::cout<<"Syntax error in _digit\n";
+
     return nullptr;
 }
 
@@ -101,7 +101,7 @@ op* _counter(it first , it last) {
     token left_bra = next_token(first, last);
     counter* expr = new counter;
     if(left_bra.id != token::LEFT_BRA) {
-        std::cout<<"Syntax error in _counter, token::LEFT_BRA\n";
+        std::cout<<"was not counter\n";
         return nullptr;
     }
     first++;
@@ -124,7 +124,7 @@ op* _group(it first , it last) { // <group>	::=	"(" <RE> ")"
     token left_par = next_token(first, last);
     group* expr = new group;
     if(left_par.id != token::LEFT_PAR) {
-        std::cout<<"Syntax error in _group, token::LEFT_PAR\n";
+        std::cout<<"was not group\n";
         return nullptr;
     }
     first++;
@@ -146,13 +146,13 @@ op* _group(it first , it last) { // <group>	::=	"(" <RE> ")"
 op* _star(it first, it last) { // <star> ::= <elementary-RE> "*" ändra sida?
     op* elementary_re_expr = _elementary_re(first, last);
     if(!elementary_re_expr) {
-        std::cout<<"Syntax error in _star, elementary_re_expr\n";
+        std::cout<<"was not star\n";
         return nullptr;
     }
     first++;
     token tk = next_token(first, last);
     if(tk.id != token::STAR) {
-        std::cout<<"Syntax error in _star, token::STAR\n";
+        std::cout<<"was not star\n";
         return nullptr;
     }
     star * expr = new star;
@@ -164,13 +164,13 @@ op* _star(it first, it last) { // <star> ::= <elementary-RE> "*" ändra sida?
 op* _plus(it first, it last) { // <plus> ::= <elementary-RE> "+"
     op* elementary_re_expr = _elementary_re(first, last);
     if(!elementary_re_expr) {
-        std::cout<<"Syntax error in _plus, elementary_re_expr\n";
+        std::cout<<"was not plus\n";
         return nullptr;
     }
     first++;
     token tk = next_token(first, last);
     if(tk.id != token::PLUS) {
-        std::cout<<"Syntax error in _plus, token::PLUS\n";
+        std::cout<<"was not plus\n";
         return nullptr;
     }
     plus* expr = new plus;
@@ -190,7 +190,7 @@ op* _elementary_re(it first , it last) { // <elementary-RE>	::=	<char> | <group>
         }
     }
     if(!char_group_any_counter) {
-        std::cout<<"Syntax error in _elementary_re\n";
+        std::cout<<"was not elementary re\n";
         return nullptr;
     }
     elementary_re * expr = new elementary_re;
@@ -201,14 +201,14 @@ op* _concat(it first , it last) { // <concatenation> ::= <basic-RE> <simple-RE>
 
     op* basic_re_expr = _basic_re(first, last);
     if(!basic_re_expr) {
-        std::cout<<"Syntax error in _concat, basic_re\n";
+        std::cout<<"was not concat\n";
         return nullptr;
     }
     first++;
     op* simple_re_expr = new simple_re;
     simple_re_expr = _simple_re(first, last);
     if(!simple_re_expr) {
-        std::cout<<"Syntax error in _concat, simple_re\n";
+        std::cout<<"was not concat\n";
         return nullptr;
     }
     concat* expr = new concat;
@@ -225,7 +225,7 @@ op* _basic_re(it first , it last) { // <basic-RE> ::= <elementary-RE> | <plus> |
         }
     }
     if(!elem_or_star_or_plus) {
-       std::cout<<"Syntax error in _basic_re\n"; 
+       std::cout<<"was not basic re \n";
        return nullptr;
     }
     basic_re* expr = new basic_re;
@@ -250,20 +250,18 @@ op* _substitute(it first, it last) { // <substitute> ::= <simple-RE>  "|" <RE>
     substitute* expr = new substitute;
     op* simple_re_expr = _simple_re(first, last); //lhs
     if(!simple_re_expr) {
-        std::cout<<"Syntax error in substitute, SIMPLE_RE\n";
         return nullptr;
     } 
     first++;
     token or_token = next_token(first, last);
     if(or_token.id = token::OR) {
-        std::cout<<"Syntax error in substitute, OR \n";
+        std::cout<<"was not substitute \n";
         return nullptr;
     }
     first++;
     op* re_expr = new re;
     re_expr = _re(first, last);
     if(!re_expr) {
-        std::cout<<"Syntax error in substitute, RE\n";
         return nullptr;
     }
     expr->operands.push_back(simple_re_expr);
@@ -271,17 +269,16 @@ op* _substitute(it first, it last) { // <substitute> ::= <simple-RE>  "|" <RE>
     return expr;
 }
 
-op* _re(it first, it last) { // <RE> ::= <simple-RE> | <substitute> 
+op* _re(it first, it last) { // <RE> ::= <substitute>  |  <simple-RE>
     op* expr = new re;
-    op* simple_or_substitue= _simple_re(first, last);
+    op* simple_or_substitue= _substitute(first, last);
     if (!simple_or_substitue) {
-        simple_or_substitue= _substitute(first, last);
+        simple_or_substitue= _simple_re(first, last);
     }
     if(!simple_or_substitue) {
         return nullptr;
     }
     expr->operands.push_back(simple_or_substitue);
-
     return expr;
 }
 
@@ -294,7 +291,9 @@ void loop(op*& o){
 int main(int argc, char** argv) {
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string input = "lo* could.{3}";
+    //std::string input = "(.|.)";
     op* result = _re(input.begin(), input.end());
+    std::cout<<std::endl;
     loop(result);
     int stop;
     std::cin>>stop;
