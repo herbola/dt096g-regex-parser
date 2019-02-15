@@ -32,7 +32,7 @@
 <counter> ::= "{" <digit> "}" , "{" <digit> "}" <re>
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <any>	::=	".", "." <re>
-<charachter>	::=	any non metacharacter | "\" metacharacter , <char> <RE>
+<charachter>	::= <char> , <char> <RE>
 
 
 */
@@ -68,7 +68,7 @@ op* char_expr(it first, it last) { // <charachter>	::=	<bokstäver>, <bokstäver
     character* chr = new character;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
-        std::cout<<"was not a character\n";
+        std::cout<<"##### was not a character\n";
         return nullptr;
     }
     chr->_id = tk.text;
@@ -102,7 +102,7 @@ op* any_expr(it first, it last) { // <any>	::=	".", "." <re>
     token tk = next_token(first, last);
     any* expr = new any;
     if(tk.id != token::ANY) {
-        std::cout<<"was not any\n";
+        std::cout<<"##### was not any\n";
         return nullptr;
     }
     first++;
@@ -118,7 +118,7 @@ op* counter_expr(it first , it last) { // <counter> ::= "{" <digit> "}" , "{" <d
     token left_bra = next_token(first, last);
     counter* expr = new counter;
     if(left_bra.id != token::LEFT_BRA) {
-        std::cout<<"was not counter\n";
+        std::cout<<"##### was not counter\n";
         return nullptr;
     }
     first++;
@@ -149,7 +149,7 @@ op* group_expr(it first , it last) { // <group>	::=	"(" <RE> ")" ,"(" <RE> ")"  
     token left_par = next_token(first, last);
     group* expr = new group;
     if(left_par.id != token::LEFT_PAR) {
-        std::cout<<"was not group\n";
+        std::cout<<"##### was not group\n";
         return nullptr;
     }
     first++;
@@ -176,13 +176,13 @@ op* star_expr(it first, it last) { // <star> ::= <elementary-RE> "*", <elementar
     std::cout<<"FUNC() -> star_expr"<<std::endl; 
     op* elementary_re_expr = elemtentary_re_expr(first, last);
     if(!elementary_re_expr) {
-        std::cout<<"was not star elem\n";
+        std::cout<<"##### was not star elem\n";
         return nullptr;
     }
     first++;
     token tk = next_token(first, last);
     if(tk.id != token::STAR) {
-        std::cout<<"was not star\n";
+        std::cout<<"##### was not star\n";
         return nullptr;
     }
     first++;
@@ -204,7 +204,7 @@ op* plus_expr(it first, it last) { // <plus> ::= <elementary-RE> "+", <elementar
     first++;
     token tk = next_token(first, last);
     if(tk.id != token::PLUS) {
-        std::cout<<"was not plus\n";
+        std::cout<<"##### was not plus\n";
         return nullptr;
     }
     plus* expr = new plus;
@@ -229,7 +229,7 @@ op* elemtentary_re_expr(it first , it last) { // <elementary-RE>	::=	<char> | <g
         }
     }
     if(!char_group_any_counter) {
-        std::cout<<"was not elementary re\n";
+        std::cout<<"##### was not elementary re\n";
         return nullptr;
     }
     elementary_re * expr = new elementary_re;
@@ -240,14 +240,14 @@ op* concat_expr(it first , it last) { // <concatenation> ::= <basic-RE> <simple-
     std::cout<<"FUNC() -> concat_expr"<<std::endl; 
     op* basic_expr = basic_re_expr(first, last);
     if(!basic_re_expr) {
-        std::cout<<"was not concat\n";
+        std::cout<<"##### was not concat\n";
         return nullptr;
     }
     first++;
     op* simple_expr = new simple_re;
     simple_expr = simple_re_expr(first, last);
     if(!simple_re_expr) {
-        std::cout<<"was not concat\n";
+        std::cout<<"##### was not concat\n";
         return nullptr;
     }
     concat* expr = new concat;
@@ -266,7 +266,7 @@ op* basic_re_expr(it first , it last) { // <basic-RE>	::= <star> | <plus> | <ele
         }
     }
     if(!elem_or_star_or_plus) {
-       std::cout<<"was not basic re \n";
+       std::cout<<"##### was not basic re \n";
        return nullptr;
     }
     expr->operands.push_back(elem_or_star_or_plus);
@@ -297,7 +297,7 @@ op* substitute_expr(it first, it last) { // <substitute> ::= <simple-RE>  "|" <R
     first++;
     token or_token = next_token(first, last);
     if(or_token.id = token::OR) {
-        std::cout<<"was not substitute \n";
+        std::cout<<"##### was not substitute \n";
         return nullptr;
     }
     first++;
@@ -312,10 +312,13 @@ op* substitute_expr(it first, it last) { // <substitute> ::= <simple-RE>  "|" <R
 }
 
 op* regular_expression(it first, it last) { // <RE> ::= <substitute>  |  <simple-RE>
+    if(*first == *last) {
+        return nullptr;
+    }
     std::cout<<"FUNC() -> regular_expression"<<std::endl;
-    std::cout<<std::endl<<*first<<" -> CHARACTER"<< std::endl;
-    std::cin.ignore();
-    std::cin.get();  
+    std::cout<<std::endl<<*first<<" -> CURRENT CHARACTER"<< std::endl;
+    // std::cin.ignore();
+    // std::cin.get();  
     op* expr = new re;
     op* simple_or_substitue= substitute_expr(first, last);
     if (!simple_or_substitue) {
@@ -335,8 +338,9 @@ void loop(op*& o){
     }
 }
 int main(int argc, char** argv) {
-    std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
+    std::string source = "Waterloo I ##### was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string input = "lo* could.{3}";
+    //std::string input = "loda";
     //std::string input = "(.|.)";
     op* result = regular_expression(input.begin(), input.end());
     std::cout<<std::endl;
