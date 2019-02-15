@@ -20,18 +20,18 @@
 
 /*
     
-<RE>	::=	 <substitute> | <simple-RE>  if sub + 3 exexex
+<RE> ::= <substitute>  |  <simple-RE>  if sub + 3 exexex
 <substitute>	::=	<simple-RE>  "|" <RE>
 <simple-RE>	::=	<basic-RE> |  concatenation> 
 <concatenation>	::=	<basic-RE> <simple-RE> 
-<basic-RE>	::=	 <elementary-RE> | <plus> | <star> 
-<star>	::=	<elementary-RE> "*" ändra sida?
-<plus>	::=	<elementary-RE> "+"  ändra sida?
+<basic-RE>	::= <star> | <plus> | <elementary-RE> 
+<star>	::=	"*", "*" <re>
+<plus>	::=	"+", "*" <re>
 <elementary-RE>	::=	<char> | <group> | <any> | <counter>
 <group>	::=	"(" <RE> ")" , "(" <RE> ")" <RE>
 <counter> ::= "{" <digit> "}"
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-<any>	::=	"."
+<any>	::=	".", "." <re>
 <charachter>	::=	any non metacharacter | "\" metacharacter , <char> <RE>
 
 */
@@ -63,6 +63,7 @@ op* char_expr(it first , it last);
 op* any_expr(it first , it last);
 
 op* char_expr(it first, it last) { // <charachter>	::=	any non metacharacter | "\" metacharacter
+    std::cout<<"FUNC() -> char_expr"<<std::endl;
     character* chr = new character;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
@@ -79,6 +80,7 @@ op* char_expr(it first, it last) { // <charachter>	::=	any non metacharacter | "
 }
 
 op* digit_expr(it first, it last) { // <digit> ::= [0 - 9]
+    std::cout<<"FUNC() -> digit_expr"<<std::endl;
     digit* dig = new digit;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
@@ -94,14 +96,24 @@ op* digit_expr(it first, it last) { // <digit> ::= [0 - 9]
     return nullptr;
 }
 
-op* any_expr(it first, it last) {
+op* any_expr(it first, it last) { // <any>	::=	".", "." <re>
+    std::cout<<"FUNC() -> any_expr"<<std::endl;
     token tk = next_token(first, last);
+    any* expr = new any;
     if(tk.id != token::ANY) {
+        std::cout<<"was not any\n";
         return nullptr;
     }
-    return new any;
+    first++;
+    op* re_expr = regular_expression(first, last);
+    if(re_expr) {
+        expr->operands.push_back(re_expr);
+    }
+    return expr;
 }
 op* counter_expr(it first , it last) { // <counter> ::= "{" <digit> "}"
+    std::cout<<"FUNC() -> counter_expr"<<std::endl;
+    std::cout<<"COUNTER BEGIN"<<*first<<std::endl;
     token left_bra = next_token(first, last);
     counter* expr = new counter;
     if(left_bra.id != token::LEFT_BRA) {
@@ -110,12 +122,15 @@ op* counter_expr(it first , it last) { // <counter> ::= "{" <digit> "}"
     }
     first++;
     op* dig = digit_expr(first, last);
+    std::cout<<"COUNTER DIGIT"<<*first<<std::endl;
+    std::cout<<"COUNTER DIGIT->ID"<<dig->id()<<std::endl;
     if(!dig) {
         std::cout<<"Syntax error in counter_expr\n";
         return nullptr;
     }
     first++;
     token right_bra = next_token(first, last);
+    std::cout<<"COUNTER END"<<*first<<std::endl;
     if(right_bra.id != token::RIGHT_BRA) {
         std::cout<<"Syntax error in counter_expr, token::RIGHT_BRA\n";
         return nullptr;
@@ -125,6 +140,7 @@ op* counter_expr(it first , it last) { // <counter> ::= "{" <digit> "}"
     return expr;
 }
 op* group_expr(it first , it last) { // <group>	::=	"(" <RE> ")"
+    std::cout<<"FUNC() -> group_expr"<<std::endl;
     token left_par = next_token(first, last);
     group* expr = new group;
     if(left_par.id != token::LEFT_PAR) {
@@ -147,9 +163,11 @@ op* group_expr(it first , it last) { // <group>	::=	"(" <RE> ")"
     expr->operands.push_back(re);
     return expr;
 }
-op* star_expr(it first, it last) { // <star> ::= <elementary-RE> "*" ändra sida?
+op* star_expr(it first, it last) { // <star> ::= <elementary-RE> "*", <elementary-RE> "*" <re>
+    std::cout<<"FUNC() -> star_expr"<<std::endl; 
     op* elementary_re_expr = elemtentary_re_expr(first, last);
     if(!elementary_re_expr) {
+        std::cout<<"was not star elem\n";
         return nullptr;
     }
     first++;
@@ -158,13 +176,18 @@ op* star_expr(it first, it last) { // <star> ::= <elementary-RE> "*" ändra sida
         std::cout<<"was not star\n";
         return nullptr;
     }
+    first++;
     star * expr = new star;
     expr->operands.push_back(elementary_re_expr);
-    first++;
+    op* re_expr = regular_expression(first, last);
+    if(re_expr) {
+        expr->operands.push_back(re_expr);
+    }
     return expr;
 }
 
-op* plus_expr(it first, it last) { // <plus> ::= <elementary-RE> "+"
+op* plus_expr(it first, it last) { // <plus> ::= <elementary-RE> "+", <elementary-RE> "+" <re>
+    std::cout<<"FUNC() -> plus_expr"<<std::endl; 
     op* elementary_re_expr = elemtentary_re_expr(first, last);
     if(!elementary_re_expr) {
         return nullptr;
@@ -178,9 +201,14 @@ op* plus_expr(it first, it last) { // <plus> ::= <elementary-RE> "+"
     plus* expr = new plus;
     expr->operands.push_back(elementary_re_expr);
     first++;
+    op* re_expr = regular_expression(first, last);
+    if(re_expr) {
+        expr->operands.push_back(re_expr);
+    }
     return expr;
 }
 op* elemtentary_re_expr(it first , it last) { // <elementary-RE>	::=	<char> | <group> | <any> | <counter>
+    std::cout<<"FUNC() -> elemtentary_re_expr"<<std::endl; 
     op* char_group_any_counter = char_expr(first, last);
     if(!char_group_any_counter) {
         char_group_any_counter = group_expr(first, last);
@@ -188,9 +216,6 @@ op* elemtentary_re_expr(it first , it last) { // <elementary-RE>	::=	<char> | <g
             char_group_any_counter = any_expr(first, last);
             if(!char_group_any_counter) {
                 char_group_any_counter = counter_expr(first, last);
-                if(char_group_any_counter) {
-                    first = first + 3;
-                }
             } 
         }
     }
@@ -203,7 +228,7 @@ op* elemtentary_re_expr(it first , it last) { // <elementary-RE>	::=	<char> | <g
     return expr;
 }
 op* concat_expr(it first , it last) { // <concatenation> ::= <basic-RE> <simple-RE> 
-
+    std::cout<<"FUNC() -> concat_expr"<<std::endl; 
     op* basic_expr = basic_re_expr(first, last);
     if(!basic_re_expr) {
         std::cout<<"was not concat\n";
@@ -221,28 +246,25 @@ op* concat_expr(it first , it last) { // <concatenation> ::= <basic-RE> <simple-
     expr->operands.push_back(simple_expr);
     return expr;
 }
-op* basic_re_expr(it first , it last) { // <basic-RE> ::= <elementary-RE> | <plus> | <star> 
-    op* elem_or_star_or_plus = elemtentary_re_expr(first, last);
+op* basic_re_expr(it first , it last) { // <basic-RE>	::= <star> | <plus> | <elementary-RE>
+    std::cout<<"FUNC() -> basic_re_expr"<<std::endl; 
+    op* elem_or_star_or_plus = star_expr(first, last);
+    basic_re* expr = new basic_re;
     if(!elem_or_star_or_plus) {
-        elem_or_star_or_plus = star_expr(first, last);
+        elem_or_star_or_plus = plus_expr(first, last);
         if(!elem_or_star_or_plus) {
-          elem_or_star_or_plus = plus_expr(first, last);
-          if(elem_or_star_or_plus) {
-              first = first + 2;
-          }
-        } else {
-            first = first + 2;
+          elem_or_star_or_plus = elemtentary_re_expr(first, last);
         }
     }
     if(!elem_or_star_or_plus) {
        std::cout<<"was not basic re \n";
        return nullptr;
     }
-    basic_re* expr = new basic_re;
     expr->operands.push_back(elem_or_star_or_plus);
     return expr;
 }
-op* simple_re_expr(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation>
+op* simple_re_expr(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concatenation>    
+    std::cout<<"FUNC() -> simple_re_expr"<<std::endl;
     op* basic_re_or_concat = basic_re_expr(first, last);
     if(!basic_re_or_concat) {
         basic_re_or_concat = concat_expr(first, last);
@@ -257,6 +279,7 @@ op* simple_re_expr(it first , it last) { // <simple-RE>	::=	<basic-RE> |  concat
 }
 
 op* substitute_expr(it first, it last) { // <substitute> ::= <simple-RE>  "|" <RE>
+    std::cout<<"FUNC() -> substitute_expr"<<std::endl;
     substitute* expr = new substitute;
     op* simple_expr = simple_re_expr(first, last); //lhs
     if(!simple_expr) {
@@ -280,6 +303,10 @@ op* substitute_expr(it first, it last) { // <substitute> ::= <simple-RE>  "|" <R
 }
 
 op* regular_expression(it first, it last) { // <RE> ::= <substitute>  |  <simple-RE>
+    std::cout<<"FUNC() -> regular_expression"<<std::endl;
+    std::cout<<std::endl<<*first<<" -> CHARACTER"<< std::endl;
+    std::cin.ignore();
+    std::cin.get();  
     op* expr = new re;
     op* simple_or_substitue= substitute_expr(first, last);
     if (!simple_or_substitue) {
