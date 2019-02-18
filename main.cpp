@@ -131,15 +131,30 @@ op* any_expr(it& first, it& last) {
     any* expr = new any;
     return expr;
 }
+// character by character
+// op* char_expr(it& first, it& last) {
+//     token tk = next_token(first, last);
+//     if(tk.id != token::ID) {
+//         return nullptr;
+//     }
+//     first++;
+//     character* expr = new character;
+//     expr->_id = tk.text;
+//     return expr;
+// }
 
+// as a string
 op* char_expr(it& first, it& last) {
+    it start = first;
+    character* expr = new character;
     token tk = next_token(first, last);
-    if(tk.id != token::ID) {
+    while(tk.id == token::ID) {
+        expr->_id += tk.text;
+        tk = next_token(++first, last);
+    }
+    if(start == first) {
         return nullptr;
     }
-    first++;
-    character* expr = new character;
-    expr->_id = tk.text;
     return expr;
 }
 
@@ -384,7 +399,7 @@ void loop(op*& o, int i){
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lo\\O{3}(hej*(ka.{3})jek)";
+    std::string input = "lodawd|dwadaw";
     it begin = input.begin();
     it end = input.end();
     op* result = regular_expression(begin, end);
