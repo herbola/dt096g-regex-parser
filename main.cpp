@@ -17,6 +17,8 @@
 #include "header/counter.h"
 #include "header/any.h"
 #include "header/blank.h"
+#include "header/lowercase.h"
+#include "header/capture.h"
 
 
 /*
@@ -25,7 +27,9 @@
 <substitute>	::=	<simple-RE>  "|" <RE>
 <simple-RE>	::=  concatenation> | <basic-RE> 
 <concatenation> ::= <basic-RE> <simple-RE> 
-<basic-RE>	::= <star> | <plus> | <elementary-RE>
+<basic-RE>	::= <star> | <plus> | <lowercase> | <capture> | <elementary-RE>
+<capture> ::= <elementary-RE> "\O" <counter>
+<lowercase> ::= <elementary-RE> "\I"
 <star>	::=	<elementary-RE> "*"
 <plus> ::= <elementary-RE> "+"
 <elementary-RE>	::=	<blank> | <char> | <group> | <any> | <counter>
@@ -57,6 +61,8 @@ op* concat_expr(it& first, it& last);
 op* basic_re_expr(it& first , it& last);
 op* star_expr(it& first , it& last);
 op* plus_expr(it& first , it& last);
+op* capture_expr(it& first, it& last);
+op* lowercase_expr(it& first, it& last);
 op* elemtentary_re_expr(it& first , it& last);
 op* group_expr(it& first , it& last);
 op* counter_expr(it& first , it& last);
@@ -220,21 +226,80 @@ op* star_expr(it& first, it& last) {
     return expr;
 }
 
+op* lowercase_expr(it& first, it& last) {
+    it start = first;
+    op* elem = elemtentary_re_expr(first, last);
+    if(!elem) {
+        first = start;
+        return nullptr;
+    }
+    token tk = next_token(first, last);
+    if(tk.id != token::SLASH) {
+        first = start;
+        return nullptr;
+    }
+    first++;
+    tk = next_token(first, last);
+    if(tk.text != "I") {
+        first = start;
+        return nullptr;
+    }
+    lowercase* expr = new lowercase;
+    expr->operands.push_back(elem);
+    return expr;
+}
+
+op* capture_expr(it& first, it& last) {
+    it start = first;
+    op* elem = elemtentary_re_expr(first, last);
+    if(!elem) {
+        first = start;
+        return nullptr;
+    }
+    token tk = next_token(first, last);
+    if(tk.id != token::SLASH) {
+        first = start;
+        return nullptr;
+    }
+    first++;
+    tk = next_token(first, last);
+    if(tk.text != "O") {
+        first = start;
+        return nullptr;
+    }
+    first++;
+    op* count = counter_expr(first, last);
+    if(!count) {
+        first = start;
+        return nullptr;
+    }
+    capture * expr = new capture;
+    expr->operands.push_back(elem);
+    expr->operands.push_back(count);
+    return expr;
+}
+
 op* basic_re_expr(it& first, it& last) {
     it start = first;
-    op* star_plus_elem = star_expr(first, last);
-    if(!star_plus_elem) {
-        star_plus_elem = plus_expr(first, last);
-        if(!star_plus_elem) {
-            star_plus_elem = elemtentary_re_expr(first, last);
-            if(!star_plus_elem) {
-                first = start;
-                return nullptr;
+    op* star_plus_cap_low_elem = star_expr(first, last);
+    if(!star_plus_cap_low_elem) {
+        star_plus_cap_low_elem = plus_expr(first, last);
+        if(!star_plus_cap_low_elem) {
+            star_plus_cap_low_elem = capture_expr(first, last);
+            if(!star_plus_cap_low_elem) {
+                star_plus_cap_low_elem = lowercase_expr(first, last);
+                if(!star_plus_cap_low_elem) {
+                    star_plus_cap_low_elem = elemtentary_re_expr(first, last);
+                    if(!star_plus_cap_low_elem) {
+                        first = start;
+                        return nullptr;
+                    }
+                }
             }
         }
     }
     basic_re* expr = new basic_re;
-    expr->operands.push_back(star_plus_elem);
+    expr->operands.push_back(star_plus_cap_low_elem);
     return expr;
 }
 op* concat_expr(it& first, it& last) {
@@ -319,7 +384,7 @@ void loop(op*& o, int i){
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lo .s";
+    std::string input = "lo\\O{3}(hej*(ka.{3})jek)";
     it begin = input.begin();
     it end = input.end();
     op* result = regular_expression(begin, end);

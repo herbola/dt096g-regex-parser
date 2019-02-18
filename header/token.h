@@ -56,8 +56,8 @@ token next_token(const it& first,const  it& last) {
         case '}':
             tk = {token::RIGHT_BRA, "}"};
             break;
-        case '/':
-            tk = {token::SLASH, "/"};
+        case '\\':
+            tk = {token::SLASH, "\\"};
             break;
         default: 
             tk = {token::ID, std::string(first, first+1)};
