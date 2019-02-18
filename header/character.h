@@ -2,12 +2,12 @@
 #define CHARACTER_H
 
 #include "op.h"
-
+#include <string>
 
 struct character : op {
     std::string _id;
-    char eval(){
-        return operands[0]->eval();
+    std::string eval(std::string source){
+        return this->id();
     }
     std::string id() override{
         return this->_id;

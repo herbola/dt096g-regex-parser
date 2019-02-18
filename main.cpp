@@ -93,7 +93,6 @@ op* blank_expr(it& first, it& last) {
         return nullptr;
     }
     first++;
-    std::cout<<"BLANK WAS FOUND";
     blank* expr = new blank;
     return expr;
 }
@@ -397,15 +396,19 @@ void loop(op*& o, int i){
         loop(e, i);
     }
 }
+void exec(op* parse_tree, std::string source) {
+    std::cout<<parse_tree->eval(source);
+}
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lod awd|dwadaw";
+    std::string input = "lo* could.{3}";
     it begin = input.begin();
     it end = input.end();
     op* result = regular_expression(begin, end);
-    std::cout<<std::endl;
     loop(result);
-        int stop;
+    exec(result, source);
+    std::cout<<std::endl;
+    int stop;
     std::cin>>stop;
     return 0;
 }

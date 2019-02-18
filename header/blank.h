@@ -5,11 +5,11 @@
 
 
 struct blank : op {
-    char eval(){
-        return operands[0]->eval();
+    std::string eval(std::string source){
+        return operands[0]->eval("");
     }
     std::string id() override{
-        return "blank";
+        return "blank_space";
     }
 };
 
