@@ -16,6 +16,7 @@
 #include "header/digit.h"
 #include "header/counter.h"
 #include "header/any.h"
+#include "header/blank.h"
 
 
 /*
@@ -27,7 +28,7 @@
 <basic-RE>	::= <star> | <plus> | <elementary-RE>
 <star>	::=	<elementary-RE> "*"
 <plus> ::= <elementary-RE> "+"
-<elementary-RE>	::=	<char> | <group> | <any> | <counter>
+<elementary-RE>	::=	<blank> | <char> | <group> | <any> | <counter>
 <group>	::=	"(" <RE> ")"
 <counter> ::= "{" <digit> "}"
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
@@ -62,9 +63,10 @@ op* counter_expr(it& first , it& last);
 op* digit_expr(it& first , it& last);
 op* char_expr(it& first , it& last);
 op* any_expr(it& first , it& last);
+op* blank_expr(it& first, it& last);
+void loop(op*& o, int i = 0);
 
 op* digit_expr(it& first, it& last) {
-    std::cout<<std::endl<<"DIGIT_EXPR:"<<*first<<std::endl;
     digit* dig = new digit;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
@@ -78,25 +80,33 @@ op* digit_expr(it& first, it& last) {
     }
     return nullptr;
 }
+
+op* blank_expr(it& first, it& last) {
+    token tk = next_token(first, last);
+    if(tk.id != token::BLANK) {
+        return nullptr;
+    }
+    first++;
+    std::cout<<"BLANK WAS FOUND";
+    blank* expr = new blank;
+    return expr;
+}
+
 op* counter_expr(it& first, it& last) {
-    std::cout<<std::endl<<"COUNTER_EXPR:"<<*first<<std::endl;
     it start = first;
     token tk = next_token(first, last);
     if(tk.id != token::LEFT_BRA) {
-        std::cout<<"# was not a group\n";
         return nullptr;
     }
     first++;
     op* dig = digit_expr(first, last);
     if(!dig) {
-        std::cout<<"? syntax error in counter\n";
         first = start;
         return nullptr;
     }
     first++;
     tk = next_token(first, last);
     if(tk.id != token::RIGHT_BRA) {
-        std::cout<<"# was not a group\n";
         first = start;
         return nullptr;
     }
@@ -107,10 +117,8 @@ op* counter_expr(it& first, it& last) {
 }
 
 op* any_expr(it& first, it& last) {
-    std::cout<<std::endl<<"ANY_EXPR:"<<*first<<std::endl;
     token tk = next_token(first, last);
     if(tk.id != token::ANY){
-        std::cout<<"#was not any\n";
         return nullptr;
     }
     first++;
@@ -119,10 +127,8 @@ op* any_expr(it& first, it& last) {
 }
 
 op* char_expr(it& first, it& last) {
-    std::cout<<std::endl<<"CHAR_EXPR:"<<*first<<std::endl;
     token tk = next_token(first, last);
     if(tk.id != token::ID) {
-        std::cout<<"# was not a character\n";
         return nullptr;
     }
     first++;
@@ -132,21 +138,17 @@ op* char_expr(it& first, it& last) {
 }
 
 op* group_expr(it& first, it& last) {
-    std::cout<<std::endl<<"GROUP_EXPR:"<<*first<<std::endl;
     it start = first;
     token tk = next_token(first, last);
     if(tk.id != token::LEFT_PAR) {
-        std::cout<<"? syntax error in group \n";
         return nullptr;
     }
     first++;
     op* re_ptr = regular_expression(first, last);
     if(!re_ptr) {
-        std::cout<<"#was not group\n";
         first = start;
         return nullptr;
     }
-    first++;
     tk = next_token(first, last);
     if(tk.id != tk.RIGHT_PAR) {
         first = start;
@@ -160,29 +162,29 @@ op* group_expr(it& first, it& last) {
 }
 op* elemtentary_re_expr(it& first, it& last) {
     it start = first;
-    std::cout<<std::endl<<"ELEMENTARY_RE:"<<*first<<std::endl;
-    op* char_group_any_counter = char_expr(first ,last);
-    if(!char_group_any_counter) {
-        char_group_any_counter = group_expr(first, last);
-        if(!char_group_any_counter) {
-            char_group_any_counter = any_expr(first, last);
-            if(!char_group_any_counter) {
-                char_group_any_counter = counter_expr(first, last);
-                if(!char_group_any_counter){
-                    std::cout<<"#was not elementary_re\n";
-                    first = start;
-                    return nullptr;
+    op* blank_char_group_any_counter = blank_expr(first, last);
+    if(!blank_char_group_any_counter){
+        blank_char_group_any_counter = char_expr(first ,last);
+        if(!blank_char_group_any_counter) {
+            blank_char_group_any_counter = group_expr(first, last);
+            if(!blank_char_group_any_counter) {
+                blank_char_group_any_counter = any_expr(first, last);
+                if(!blank_char_group_any_counter) {
+                    blank_char_group_any_counter = counter_expr(first, last);
+                    if(!blank_char_group_any_counter){
+                        first = start;
+                        return nullptr;
+                    }
                 }
             }
         }
     }
     elementary_re* expr = new elementary_re;
-    expr->operands.push_back(char_group_any_counter);
+    expr->operands.push_back(blank_char_group_any_counter);
     return expr;
 }
 
 op* plus_expr(it& first, it& last) {
-    std::cout<<std::endl<<"PLUS_EXPR:"<<*first<<std::endl;
     it start = first;
     op* elem = elemtentary_re_expr(first, last);
     if(!elem) {
@@ -191,7 +193,6 @@ op* plus_expr(it& first, it& last) {
     }
     token tk = next_token(first, last);
     if(tk.id != token::PLUS) {
-        std::cout<<"#was not plus\n";
         first = start;
         return nullptr;
     }
@@ -203,7 +204,6 @@ op* plus_expr(it& first, it& last) {
 
 op* star_expr(it& first, it& last) {
     it start = first;
-    std::cout<<std::endl<<"STAR_EXPR:"<<*first<<std::endl;
     op* elem = elemtentary_re_expr(first, last);
     if(!elem) {
         first = start;
@@ -212,7 +212,6 @@ op* star_expr(it& first, it& last) {
     token tk = next_token(first, last);
     if(tk.id != token::STAR) {
         first = start;
-        std::cout<<"#was not star\n";
         return nullptr;
     }
     first++;
@@ -222,7 +221,6 @@ op* star_expr(it& first, it& last) {
 }
 
 op* basic_re_expr(it& first, it& last) {
-    std::cout<<std::endl<<"BASIC_RE_EXPR:"<<*first<<std::endl;
     it start = first;
     op* star_plus_elem = star_expr(first, last);
     if(!star_plus_elem) {
@@ -240,7 +238,6 @@ op* basic_re_expr(it& first, it& last) {
     return expr;
 }
 op* concat_expr(it& first, it& last) {
-    std::cout<<std::endl<<"CONCAT_EXPR:"<<*first<<std::endl;
     it start = first;
     op* basic_ptr = basic_re_expr(first, last);
     if(!basic_ptr) {
@@ -260,13 +257,11 @@ op* concat_expr(it& first, it& last) {
 
 op* simple_re_expr(it& first, it& last) {
     it start = first;
-    std::cout<<std::endl<<"SIMPLE_RE_EXPR:"<<*first<<std::endl;
     op* concat_or_basic = concat_expr(first, last);
     if(!concat_or_basic) {
         concat_or_basic = basic_re_expr(first, last);
         if(!concat_or_basic) {
             first = start;
-            std::cout<<"# was not simple_re\n";
             return nullptr;
         }
     }
@@ -276,13 +271,18 @@ op* simple_re_expr(it& first, it& last) {
 }
 
 op* substitute_expr(it &first, it &last) { // <substitute> ::= <simple-RE>  "|" <RE>
-    std::cout<<std::endl<<"substitute_expr:"<<*first<<std::endl;
     it start = first;
     op* simple_ptr = simple_re_expr(first, last);
     if(!simple_ptr) {
         first = start;
         return nullptr;
     }
+    token tk = next_token(first, last);
+    if(tk.id != token::OR) {
+        first = start;
+        return nullptr;
+    }
+    first ++;
     op* re_ptr = regular_expression(first ,last);
     if(!re_ptr) {
         first = start;
@@ -295,7 +295,6 @@ op* substitute_expr(it &first, it &last) { // <substitute> ::= <simple-RE>  "|" 
 }
 
 op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simple-RE>
-    std::cout<<std::endl<<"REGULAR_EXPR:"<<*first<<std::endl;
     if(*first == *last) {
         return nullptr;
     }
@@ -308,18 +307,19 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
     expr->operands.push_back(sub_or_simple);
     return expr;
 }
-
-void loop(op*& o){
+void loop(op*& o, int i){
+    i++;
+    for(int j = 0; j < i; j++) {
+        std::cout<<(j & 1? " " : "|");
+    }
     std::cout<<o->id()<<std::endl;
     for(auto e : o->operands) {
-        loop(e);
+        loop(e, i);
     }
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "odwoddwadawdawdawdawdwadwado.{3}";
-    //std::string input = "loda";   
-    //std::string input = "(.|.)";
+    std::string input = "lo .s";
     it begin = input.begin();
     it end = input.end();
     op* result = regular_expression(begin, end);

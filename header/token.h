@@ -25,15 +25,10 @@ struct token {
 using it = std::string::iterator;
 
 token next_token(const it& first,const  it& last) {
-    // while (std::isspace(*first)) {
-    //     first++;
-    // }
     if( first == last) {
         return { token::END_PROGRAM, ""};
     }
-
     token tk;
-
     switch(*first) {
         case '+':
             tk = {token::PLUS, "+"};
@@ -48,7 +43,7 @@ token next_token(const it& first,const  it& last) {
             break;
         case '|':
             tk = {token::OR, "|"};
-        break;
+            break;
         case '(':
             tk = {token::LEFT_PAR, "("};
             break;
