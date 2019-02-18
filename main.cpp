@@ -399,13 +399,13 @@ void loop(op*& o, int i){
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lodawd|dwadaw";
+    std::string input = "lod awd|dwadaw";
     it begin = input.begin();
     it end = input.end();
     op* result = regular_expression(begin, end);
     std::cout<<std::endl;
     loop(result);
-    int stop;
+        int stop;
     std::cin>>stop;
     return 0;
 }

@@ -29,12 +29,14 @@ token next_token(const it& first,const  it& last) {
         return { token::END_PROGRAM, ""};
     }
     token tk;
+    std::cout<<std::endl<<"hej"<<*first<<std::endl;
     switch(*first) {
         case '+':
             tk = {token::PLUS, "+"};
             break;
         case ' ':
             tk = {token::BLANK, " "};
+            break;
         case '*':
             tk = {token::STAR, "*"};
             break;
