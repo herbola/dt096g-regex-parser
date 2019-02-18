@@ -9,6 +9,7 @@ struct token {
         PLUS, 
         STAR,
         OR,
+        BLANK,
         SLASH, 
         LEFT_PAR,
         RIGHT_PAR,
@@ -23,10 +24,10 @@ struct token {
 
 using it = std::string::iterator;
 
-token next_token(it& first, it& last) {
-    while (std::isspace(*first)) {
-        first++;
-    }
+token next_token(const it& first,const  it& last) {
+    // while (std::isspace(*first)) {
+    //     first++;
+    // }
     if( first == last) {
         return { token::END_PROGRAM, ""};
     }
@@ -37,6 +38,8 @@ token next_token(it& first, it& last) {
         case '+':
             tk = {token::PLUS, "+"};
             break;
+        case ' ':
+            tk = {token::BLANK, " "};
         case '*':
             tk = {token::STAR, "*"};
             break;
