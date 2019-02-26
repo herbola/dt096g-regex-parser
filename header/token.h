@@ -9,7 +9,6 @@ struct token {
         PLUS, 
         STAR,
         OR,
-        BLANK,
         SLASH, 
         LEFT_PAR,
         RIGHT_PAR,
@@ -32,9 +31,6 @@ token next_token(const it& first,const  it& last) {
     switch(*first) {
         case '+':
             tk = {token::PLUS, "+"};
-            break;
-        case ' ':
-            tk = {token::BLANK, " "};
             break;
         case '*':
             tk = {token::STAR, "*"};

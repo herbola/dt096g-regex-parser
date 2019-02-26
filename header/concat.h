@@ -2,11 +2,20 @@
 #define CONCAT_H
 
 #include "op.h"
-
+using it = std::string::iterator;
 
 struct concat : op {
     object *eval(object *o) override{
-       return nullptr;
+        std::cout<<"concat: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
+        object * basic = operands[0]->eval(o);
+        if(basic) {
+            basic->rhs++;
+            object * simple = operands[1]->eval(basic);
+            if(simple) {
+                return simple;
+            } 
+        }
+        return nullptr;
     }
     std::string id() override{
         return "concat";

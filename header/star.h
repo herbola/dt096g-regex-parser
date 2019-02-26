@@ -6,9 +6,8 @@
 
 struct star : op {
     object *eval(object *o) override{
-        std::cout<<"star"<<std::endl<<*(o->lhs)<<std::endl;
+        std::cout<<"star: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         object* elem = operands[0]->eval(o);
-      
         if(elem) {
             char chr = *elem->rhs;
             while(*(elem->rhs+1) == chr) {

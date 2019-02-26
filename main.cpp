@@ -87,15 +87,15 @@ op* digit_expr(it& first, it& last) {
     return nullptr;
 }
 
-op* blank_expr(it& first, it& last) {
-    token tk = next_token(first, last);
-    if(tk.id != token::BLANK) {
-        return nullptr;
-    }
-    first++;
-    blank* expr = new blank;
-    return expr;
-}
+// op* blank_expr(it& first, it& last) {
+//     token tk = next_token(first, last);
+//     if(tk.id != token::BLANK) {
+//         return nullptr;
+//     }
+//     first++;
+//     blank* expr = new blank;
+//     return expr;
+// }
 
 op* counter_expr(it& first, it& last) {
     it start = first;
@@ -138,11 +138,11 @@ op* any_expr(it& first, it& last) {
 //     }
 //     first++;
 //     character* expr = new character;
-//     expr->_id = tk.text;
+//     expr->_id = tk.text[0];
 //     return expr;
 // }
 
-// as a string
+ //as a string
 op* char_expr(it& first, it& last) {
     it start = first;
     character* expr = new character;
@@ -383,10 +383,10 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
     if(!sub_or_simple) {
         sub_or_simple = simple_re_expr(first, last);
     }   
-    re* expr = new re;
+    re* expr = new re; 
     expr->operands.push_back(sub_or_simple);
     return expr;
-}
+} 
 void loop(op*& o, int i){
     i++;
     for(int j = 0; j < i; j++) { 
@@ -397,30 +397,32 @@ void loop(op*& o, int i){
         loop(e, i);
     }
 }
-void exec(op* parse_tree, std::string source) { 
+void exec(op* parse_tree, std::string source) {   
     object * o = new object; 
     o->lhs = o->rhs = source.begin();
-    o->rhs = source.end();
-    o = parse_tree->eval(o);
-    it start = o->lhs;  
-    it end = o->rhs;
+    o->end = source.end(); 
+    object *p = parse_tree->eval(o);
+    it start = p->lhs;  
+    it end = p->rhs; 
+    std::cout<<"Answer: ";
     for(;start!=end; start++) { 
-        std::cout<<*start;          
-    }  
- 
-}
+        std::cout<<*start;            
+    }       
+   
+}  
 int main(int argc, char** argv) {
-    std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lo*";
+    std::string source = "lloo hell o loo your hello";
+    std::string input = "hel*o";
     it begin = input.begin(); 
-    it end = input.end(); 
-    op* result = regular_expression(begin, end);
+    it end = input.end();  
+    op* result = regular_expression(begin, end); 
     loop(result);
-    exec(result, source);  
-    std::cout<<std::endl;
+    exec(result, source);   
+    std::cout<<std::endl; 
     int stop;
     std::cin>>stop;
     return 0;
-}
+} 
+ 
 
-
+  

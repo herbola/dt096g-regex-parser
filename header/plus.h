@@ -7,6 +7,7 @@
 
 struct plus : op {
     object *eval(object *o) override{
+        std::cout<<"plus: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         return operands[0]->eval(o);
     }
     std::string id() override{

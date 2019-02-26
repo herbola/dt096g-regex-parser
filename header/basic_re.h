@@ -6,7 +6,7 @@
 
 struct basic_re : op {
     object *eval(object *o) override{
-        std::cout<<"basic"<<std::endl<<*(o->lhs)<<std::endl;
+        std::cout<<"basic: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         return operands[0]->eval(o);
     }
     std::string id() override{

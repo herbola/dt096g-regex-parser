@@ -5,6 +5,7 @@
 
 struct object {
     std::string::iterator lhs, rhs, end;
+    bool found = false;
 };
 
 #endif /* OBJECT_H */

@@ -7,18 +7,18 @@
 struct character : op {
     std::string _id;
     object *eval(object *o) override{
-        std::cout<<"charater"<<std::endl<<*(o->lhs)<<std::endl;
+        std::cout<<"charater: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         for (int i = 0; i < size(); i++) {
-            std::cout<<*(o->lhs+i)<<i;
-            if(*(o->lhs+i) != *(id().begin()+i)) {
+            if(*(o->rhs+i) != *(_id.begin()+i)) {
                 return nullptr;
             }
         }
-        o->rhs += size()-1;
+        std::cout<<"SUCCED";
+        o->rhs += size();
         return o;
     }
     std::string id() override{
-        return this->_id;
+        return "character(" + this->_id + ")";
     }
     int size() {
         return _id.size();
