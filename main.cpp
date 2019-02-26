@@ -151,7 +151,7 @@ op* char_expr(it& first, it& last) {
         expr->_id += tk.text;
         tk = next_token(++first, last);
     }
-    if(start == first) {
+    if(start == first) { 
         return nullptr;
     }
     return expr;
@@ -389,32 +389,34 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
 }
 void loop(op*& o, int i){
     i++;
-    for(int j = 0; j < i; j++) {
+    for(int j = 0; j < i; j++) { 
         std::cout<<(j & 1? " " : "|");
     }
-    std::cout<<o->id()<<std::endl;
+    std::cout<<o->id()<<std::endl; 
     for(auto e : o->operands) {
         loop(e, i);
     }
 }
 void exec(op* parse_tree, std::string source) { 
-    object * o = new object(source);
-     o = parse_tree->eval(o);
-    // it start = o->lhs;
-    // it end = o->rhs;
-    // for(;start!=end; start++) {
-    //     std::cout<<*start;
-    // }
-
+    object * o = new object; 
+    o->lhs = o->rhs = source.begin();
+    o->rhs = source.end();
+    o = parse_tree->eval(o);
+    it start = o->lhs;  
+    it end = o->rhs;
+    for(;start!=end; start++) { 
+        std::cout<<*start;          
+    }  
+ 
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::string input = "lo*";
-    it begin = input.begin();
+    it begin = input.begin(); 
     it end = input.end(); 
     op* result = regular_expression(begin, end);
     loop(result);
-    exec(result, source); 
+    exec(result, source);  
     std::cout<<std::endl;
     int stop;
     std::cin>>stop;

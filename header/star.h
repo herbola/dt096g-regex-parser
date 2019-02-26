@@ -5,8 +5,8 @@
 #include "object.h"
 
 struct star : op {
-    object *eval(object *o){
-          std::cout<<"star";
+    object *eval(object *o) override{
+        std::cout<<"star"<<std::endl<<*(o->lhs)<<std::endl;
         object* elem = operands[0]->eval(o);
       
         if(elem) {

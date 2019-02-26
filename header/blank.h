@@ -5,7 +5,7 @@
 
 
 struct blank : op {
-    object *eval(object *o){
+    object *eval(object *o) override{
         return operands[0]->eval(o);
     }
     std::string id() override{

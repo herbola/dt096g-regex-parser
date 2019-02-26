@@ -6,11 +6,11 @@
 #include <iostream>
 
 struct elementary_re: op {
-    object *eval(object *o){
+    object *eval(object *o) override{
+        std::cout<<"elem"<<std::endl<<*(o->lhs)<<std::endl;
         std::string prev = operands[0]->id();
         object* elem = operands[0]->eval(o);
         while(!elem) {
-            std::cout<<*elem->lhs;
             o->rhs =++o->lhs;
             elem = operands[0]->eval(o);
         }

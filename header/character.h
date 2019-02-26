@@ -6,17 +6,22 @@
 
 struct character : op {
     std::string _id;
-    object *eval(object *o){
-        for (int i = 0; i< _id.size(); i++) {
+    object *eval(object *o) override{
+        std::cout<<"charater"<<std::endl<<*(o->lhs)<<std::endl;
+        for (int i = 0; i < size(); i++) {
+            std::cout<<*(o->lhs+i)<<i;
             if(*(o->lhs+i) != *(id().begin()+i)) {
                 return nullptr;
             }
         }
-        o->rhs += this->id().size();
+        o->rhs += size()-1;
         return o;
     }
     std::string id() override{
         return this->_id;
+    }
+    int size() {
+        return _id.size();
     }
 };
 
