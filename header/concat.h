@@ -6,7 +6,7 @@
 
 struct concat : op {
     object *eval(object *o){
-       
+       return nullptr;
     }
     std::string id() override{
         return "concat";

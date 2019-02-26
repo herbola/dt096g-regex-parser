@@ -14,9 +14,8 @@ struct star : op {
             while(*(elem->rhs+1) == chr) {
                 elem->rhs++;
             }
-        } else {
-            return nullptr;
-        }
+        } 
+        return elem;
     }
     std::string id() override{
         return "star";
