@@ -412,7 +412,7 @@ void exec(op* parse_tree, std::string source) {
 }  
 int main(int argc, char** argv) {
     std::string source = "lloo hell o loo your hello";
-    std::string input = "o.{3}";
+    std::string input = "hel*o";
     it begin = input.begin(); 
     it end = input.end();  
     op* result = regular_expression(begin, end); 
