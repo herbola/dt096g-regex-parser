@@ -6,9 +6,6 @@
 struct any: op {
     object *eval(object *o) override {
         std::cout<<"any: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
-        int hej;
-        std::cin.ignore();
-        std::cin>>hej; 
         if(++o->rhs != o->end) {
             return o;
         }
