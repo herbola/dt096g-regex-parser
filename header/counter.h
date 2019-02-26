@@ -5,8 +5,18 @@
 
 
 struct counter: op {
-    object *eval(object *o) override{
-        return operands[0]->eval(o);
+    int counter = -1;
+    object * eval(object *o) override {
+        int hej;
+        std::cin>>hej;
+        std::cout<<"\n\n"<<counter<<"\n\n";
+        if(counter = -1) {
+            counter = atoi(operands[0]->id().c_str());
+        }
+        if(counter-- > 0) {
+            return o;
+        }
+        return nullptr;
     }
     std::string id() override{
         return "counter";
