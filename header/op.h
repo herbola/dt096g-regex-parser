@@ -16,7 +16,7 @@ struct op {
         std::string::iterator start, end;
         start = o->lhs;
         end = o->rhs;
-        for(;start!=end+1; start++) { 
+        for(;start!=end; start++) { 
         std::cout<<*start;          
         }   
         std::cout<<std::endl;

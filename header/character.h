@@ -7,7 +7,7 @@
 struct character : op {
     std::string _id;
     object *eval(object *o) override{
-        std::cout<<"charater: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
+        std::cout<<"character: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         for (int i = 0; i < size(); i++) {
             if(*(o->rhs+i) != *(_id.begin()+i)) {
                 return nullptr;

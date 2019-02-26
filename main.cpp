@@ -54,7 +54,7 @@ using it = std::string::iterator;
 op* regular_expression(it& first, it& last);
 op* substitute_expr(it& first, it& last);
 op* simple_re_expr(it& first , it& last);
-op* concat_expr(it& first, it& last);
+op* concat_expr(it& first, it& last); 
 op* basic_re_expr(it& first , it& last);
 op* star_expr(it& first , it& last);
 op* plus_expr(it& first , it& last);
@@ -415,19 +415,19 @@ void exec(op* parse_tree, std::string source) {
     }       
    
 }  
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { 
     std::string source = "lloo hell o loo your hello";
     std::string input = "o.{3}";
-    it begin = input.begin(); 
-    it end = input.end();  
+    it begin = input.begin();    
+    it end = input.end();   
     op* result = regular_expression(begin, end); 
-    loop(result);
-    // exec(result, source);   
-    std::cout<<std::endl; 
+    loop(result); 
+     exec(result, source);   
+    std::cout<<std::endl;  
     int stop;
-    std::cin>>stop;
-    return 0;
+    std::cin>>stop;  
+    return 0; 
 } 
  
 
-  
+       

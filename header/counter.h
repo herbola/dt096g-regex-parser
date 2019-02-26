@@ -5,15 +5,17 @@
 
 
 struct counter: op {
-    int counter = -1;
     object * eval(object *o) override {
-        if(counter = -1) {
-            counter = atoi(operands[0]->id().c_str());
+        int counter = atoi(operands[1]->id().c_str());
+        for(; counter > 0; counter--) {
+            std::cout<<"counter: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<" COUNTER:"<<counter<<std::endl;
+            object * temp = operands[0]->eval(o);
+            if(!o) {
+                return nullptr;
+            }
+            o = temp;
         }
-        if(counter-- > 0) {
-            return o;
-        }
-        return nullptr;
+        return o;
     }
     std::string id() override{
         return "counter";
