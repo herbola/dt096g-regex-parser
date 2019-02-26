@@ -22,24 +22,21 @@
 #include "header/object.h"
 
 /*
-    
 <RE> ::= <substitute>  |  <simple-RE>
 <substitute>	::=	<simple-RE>  "|" <RE>
 <simple-RE>	::=  concatenation> | <basic-RE> 
 <concatenation> ::= <basic-RE> <simple-RE> 
-<basic-RE>	::= <star> | <plus> | <lowercase> | <capture> | <elementary-RE>
+<basic-RE>	::= <star> | <plus> | <counter> | <lowercase> | <capture> | <elementary-RE>
 <capture> ::= <elementary-RE> "\O" <counter>
 <lowercase> ::= <elementary-RE> "\I"
 <star>	::=	<elementary-RE> "*"
+<counter> ::= <elementary-Re>  "{" <digit> "}"
 <plus> ::= <elementary-RE> "+"
-<elementary-RE>	::=	<blank> | <char> | <group> | <any> | <counter>
+<elementary-RE>	::=	<blank> | <char> | <group> | <any> 
 <group>	::=	"(" <RE> ")"
-<counter> ::= "{" <digit> "}"
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <any>	::=	"."
 <charachter>	::= <char>
-
-
 */
 
 
@@ -99,8 +96,14 @@ op* digit_expr(it& first, it& last) {
 
 op* counter_expr(it& first, it& last) {
     it start = first;
+    op* elem = elemtentary_re_expr(first, last);
+    if(!elem) {
+        first = start;
+        return nullptr;
+    }
     token tk = next_token(first, last);
     if(tk.id != token::LEFT_BRA) {
+        first = start;
         return nullptr;
     }
     first++;
@@ -117,6 +120,7 @@ op* counter_expr(it& first, it& last) {
     }
     first++;
     counter * expr = new counter;
+    expr->operands.push_back(elem);
     expr->operands.push_back(dig);
     return expr;
 }
@@ -191,11 +195,8 @@ op* elemtentary_re_expr(it& first, it& last) {
             if(!blank_char_group_any_counter) {
                 blank_char_group_any_counter = any_expr(first, last);
                 if(!blank_char_group_any_counter) {
-                    blank_char_group_any_counter = counter_expr(first, last);
-                    if(!blank_char_group_any_counter){
-                        first = start;
-                        return nullptr;
-                    }
+                    first = start;
+                    return nullptr;
                 }
             }
         }
@@ -300,18 +301,22 @@ op* basic_re_expr(it& first, it& last) {
     if(!star_plus_cap_low_elem) {
         star_plus_cap_low_elem = plus_expr(first, last);
         if(!star_plus_cap_low_elem) {
-            star_plus_cap_low_elem = capture_expr(first, last);
-            if(!star_plus_cap_low_elem) {
-                star_plus_cap_low_elem = lowercase_expr(first, last);
+           star_plus_cap_low_elem = counter_expr(first, last);
+           if(!star_plus_cap_low_elem) {
+                star_plus_cap_low_elem = capture_expr(first, last);
                 if(!star_plus_cap_low_elem) {
-                    star_plus_cap_low_elem = elemtentary_re_expr(first, last);
+                    star_plus_cap_low_elem = lowercase_expr(first, last);
                     if(!star_plus_cap_low_elem) {
-                        first = start;
-                        return nullptr;
+                        star_plus_cap_low_elem = elemtentary_re_expr(first, last);
+                        if(!star_plus_cap_low_elem) {
+                            first = start;
+                            return nullptr;
+                        }
                     }
                 }
             }
         }
+        
     }
     basic_re* expr = new basic_re;
     expr->operands.push_back(star_plus_cap_low_elem);
@@ -412,12 +417,12 @@ void exec(op* parse_tree, std::string source) {
 }  
 int main(int argc, char** argv) {
     std::string source = "lloo hell o loo your hello";
-    std::string input = "hel*o";
+    std::string input = "o.{3}";
     it begin = input.begin(); 
     it end = input.end();  
     op* result = regular_expression(begin, end); 
     loop(result);
-    exec(result, source);   
+    // exec(result, source);   
     std::cout<<std::endl; 
     int stop;
     std::cin>>stop;
