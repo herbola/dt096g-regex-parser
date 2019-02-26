@@ -5,8 +5,8 @@
 
 
 struct concat : op {
-    std::string eval(std::string source){
-        return operands[0]->eval(source) + operands[1]->eval(source);
+    object *eval(object *o){
+       
     }
     std::string id() override{
         return "concat";

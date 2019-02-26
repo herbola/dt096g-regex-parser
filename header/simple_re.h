@@ -2,11 +2,11 @@
 #define SIMPLE_RE_H
 
 #include "op.h"
-
+#include "object.h"
 
 struct simple_re : op {
-    std::string eval(std::string source){
-        return operands[0]->eval(source);
+    object *eval(object *o){
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return "simple_re";

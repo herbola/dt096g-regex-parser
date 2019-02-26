@@ -19,7 +19,7 @@
 #include "header/blank.h"
 #include "header/lowercase.h"
 #include "header/capture.h"
-
+#include "header/object.h"
 
 /*
     
@@ -182,7 +182,8 @@ op* group_expr(it& first, it& last) {
 }
 op* elemtentary_re_expr(it& first, it& last) {
     it start = first;
-    op* blank_char_group_any_counter = blank_expr(first, last);
+    // op* blank_char_group_any_counter = blank_expr(first, last);
+        op* blank_char_group_any_counter = nullptr;
     if(!blank_char_group_any_counter){
         blank_char_group_any_counter = char_expr(first ,last);
         if(!blank_char_group_any_counter) {
@@ -396,17 +397,24 @@ void loop(op*& o, int i){
         loop(e, i);
     }
 }
-void exec(op* parse_tree, std::string source) {
-    std::cout<<parse_tree->eval(source);
+void exec(op* parse_tree, std::string source) { 
+    object * o = new object(source);
+     o = parse_tree->eval(o);
+    // it start = o->lhs;
+    // it end = o->rhs;
+    // for(;start!=end; start++) {
+    //     std::cout<<*start;
+    // }
+
 }
 int main(int argc, char** argv) {
     std::string source = "Waterloo I  was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "lo* could.{3}";
+    std::string input = "lo*";
     it begin = input.begin();
-    it end = input.end();
+    it end = input.end(); 
     op* result = regular_expression(begin, end);
     loop(result);
-    exec(result, source);
+    exec(result, source); 
     std::cout<<std::endl;
     int stop;
     std::cin>>stop;

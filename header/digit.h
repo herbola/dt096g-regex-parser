@@ -7,8 +7,8 @@
 struct digit : op {
     std::string _id;
     std::string digits = "0123456789";
-    std::string eval(std::string source){
-        return operands[0]->eval("");
+    object *eval(object *o){
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return this->_id;

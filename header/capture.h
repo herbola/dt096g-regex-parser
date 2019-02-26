@@ -5,8 +5,8 @@
 
 
 struct capture: op {
-    std::string eval(std::string source){
-        return operands[0]->eval("");
+    object *eval(object *o){
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return "capture";

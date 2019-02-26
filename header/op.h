@@ -3,9 +3,12 @@
 
 #include <string>
 #include <vector>
+#include "object.h"
+#include <iostream>
+
 
 struct op {
-    virtual std::string eval(std::string source) = 0;
+    virtual object* eval(object * o) = 0;
     virtual std::string id() = 0;
     std::vector<op*> operands;
 };

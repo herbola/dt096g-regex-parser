@@ -5,8 +5,8 @@
 
 
 struct basic_re : op {
-    std::string eval(std::string source){
-        return operands[0]->eval(source);
+    object *eval(object *o){
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return "basic_re";

@@ -5,8 +5,8 @@
 
 
 struct any: op {
-    std::string eval(std::string source) {
-        return source;
+    object *eval(object *o){
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return "any";

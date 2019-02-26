@@ -6,8 +6,14 @@
 
 struct character : op {
     std::string _id;
-    std::string eval(std::string source){
-        return this->id();
+    object *eval(object *o){
+        for (int i = 0; i< _id.size(); i++) {
+            if(*(o->lhs+i) != *(id().begin()+i)) {
+                return nullptr;
+            }
+        }
+        o->rhs += this->id().size();
+        return o;
     }
     std::string id() override{
         return this->_id;

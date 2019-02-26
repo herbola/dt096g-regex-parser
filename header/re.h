@@ -2,11 +2,12 @@
 #define RE_H
 
 #include "op.h"
-
+#include "object.h"
 
 struct re : op {
-    std::string eval(std::string source){
-        return operands[0]->eval(source);
+    object *eval(object *o){
+        std::cout<<"re";
+        return operands[0]->eval(o);
     }
     std::string id() override{
         return "re";
