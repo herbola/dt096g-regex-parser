@@ -459,6 +459,7 @@ int execute(op* parse_tree, std::string source) {
 }     
 void print_alternatives(std::vector<std::string> & vec) {
     system("clear");
+    system("CLS");
     Color::Modifier test(Color::FG_TEST), purple(Color::FG_PURPLE),def(Color::FG_DEFAULT); 
     std::cout<<purple<<"Choose regex "<<def<<std::endl;
     int i = 0;
@@ -490,10 +491,12 @@ int main(int argc, char** argv) {
         }
         if(input == "") {
             system("clear");
+            system("CLS");
             std::cout<<"Enter your regex and press enter..\n";
             std::getline(std::cin, input);
         }
         system("clear");
+        system("CLS");
         it begin = input.begin();    
         it end = input.end();  
         op* result = program_parse(begin, end);  
