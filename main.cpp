@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include "header/colormod.h"
 #include <string>
 #include "header/op.h"
 #include "header/token.h"
@@ -9,14 +10,12 @@
 #include "header/basic_re.h"
 #include "header/concat.h"
 #include "header/elementary_re.h"
-#include "header/plus.h"
 #include "header/group.h"
 #include "header/star.h"
 #include "header/character.h"
 #include "header/digit.h"
 #include "header/counter.h"
 #include "header/any.h"
-#include "header/blank.h"
 #include "header/lowercase.h"
 #include "header/capture.h"
 #include "header/object.h"
@@ -59,7 +58,6 @@ op* simple_re_expr(it& first , it& last);
 op* concat_expr(it& first, it& last); 
 op* basic_re_expr(it& first , it& last);
 op* star_expr(it& first , it& last);
-op* plus_expr(it& first , it& last);
 op* capture_expr(it& first, it& last);
 op* lowercase_expr(it& first, it& last);
 op* elemtentary_re_expr(it& first , it& last);
@@ -208,23 +206,6 @@ op* elemtentary_re_expr(it& first, it& last) {
     return expr;
 }
 
-op* plus_expr(it& first, it& last) {
-    it start = first;
-    op* elem = elemtentary_re_expr(first, last);
-    if(!elem) {
-        first = start;
-        return nullptr;
-    }
-    token tk = next_token(first, last);
-    if(tk.id != token::PLUS) {
-        first = start;
-        return nullptr;
-    }
-    plus* expr = new plus; 
-    first++;
-    expr->operands.push_back(elem);
-    return expr;
-}
 
 op* star_expr(it& first, it& last) {
     it start = first;
@@ -287,11 +268,27 @@ op* capture_expr(it& first, it& last) {
         return nullptr;
     }
     first++;
-    op* count = counter_expr(first, last);
-    if(!count) {
+    // 
+    tk = next_token(first, last);
+    if(tk.id != token::LEFT_BRA) {
         first = start;
         return nullptr;
     }
+    first++;
+    op* dig = digit_expr(first, last);
+    if(!dig) {
+        first = start;
+        return nullptr;
+    }
+    first++;
+    tk = next_token(first, last);
+    if(tk.id != token::RIGHT_BRA) {
+        first = start;
+        return nullptr;
+    }
+    first++;
+    counter * count= new counter;
+    count->operands.push_back(dig);
     capture * expr = new capture;
     expr->operands.push_back(elem);
     expr->operands.push_back(count);
@@ -300,29 +297,25 @@ op* capture_expr(it& first, it& last) {
 
 op* basic_re_expr(it& first, it& last) {
     it start = first;
-    op* star_plus_cap_low_elem = star_expr(first, last);
-    if(!star_plus_cap_low_elem) {
-        star_plus_cap_low_elem = plus_expr(first, last);
-        if(!star_plus_cap_low_elem) {
-           star_plus_cap_low_elem = counter_expr(first, last);
-           if(!star_plus_cap_low_elem) {
-                star_plus_cap_low_elem = capture_expr(first, last);
-                if(!star_plus_cap_low_elem) {
-                    star_plus_cap_low_elem = lowercase_expr(first, last);
-                    if(!star_plus_cap_low_elem) {
-                        star_plus_cap_low_elem = elemtentary_re_expr(first, last);
-                        if(!star_plus_cap_low_elem) {
-                            first = start;
-                            return nullptr;
-                        }
+    op* star_cap_low_elem = star_expr(first, last);
+    if(!star_cap_low_elem) {
+        star_cap_low_elem = counter_expr(first, last);
+        if(!star_cap_low_elem) {
+            star_cap_low_elem = capture_expr(first, last);
+            if(!star_cap_low_elem) {
+                star_cap_low_elem = lowercase_expr(first, last);
+                if(!star_cap_low_elem) {
+                    star_cap_low_elem = elemtentary_re_expr(first, last);
+                    if(!star_cap_low_elem) {
+                        first = start;
+                        return nullptr;
                     }
                 }
             }
         }
-        
     }
     basic_re* expr = new basic_re;
-    expr->operands.push_back(star_plus_cap_low_elem);
+    expr->operands.push_back(star_cap_low_elem);
     return expr;
 }
 op* concat_expr(it& first, it& last) {
@@ -380,8 +373,8 @@ op* substitute_expr(it &first, it &last) { // <substitute> ::= <simple-RE>  "|" 
     expr->operands.push_back(simple_ptr);
     expr->operands.push_back(re_ptr);
     return expr;
-}
-
+}   
+ 
 op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simple-RE>
     if(*first == *last) {
         return nullptr;
@@ -392,8 +385,8 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
     }   
     re* expr = new re; 
     expr->operands.push_back(sub_or_simple);
-    return expr;
-} 
+    return expr; 
+}  
 
 op* program_parse(it &first, it &last) {
     if(*first == *last) {
@@ -414,32 +407,63 @@ void loop(op*& o, int i){
         loop(e, i);
     }
 }
-void exec(op* parse_tree, std::string source) {   
+
+struct color_char{
+    it chr;
+    bool hit;
+};
+
+int execute(op* parse_tree, std::string source) {   
     object * o = new object; 
     o->lhs = o->rhs = source.begin();
     o->end = source.end(); 
     object *p = parse_tree->eval(o);
-    it start = p->lhs;  
-    it end = p->rhs; 
-    std::cout<<"Answer: ";
-    for(;start!=end; start++) { 
-        std::cout<<*start;            
-    }       
-   
+    std::vector<color_char> cc;
+    for(int i = 0; i < source.size(); i++ ) {
+        cc.push_back({source.begin()+i, false});
+    }
+    Color::Modifier red(Color::FG_RED), green(Color::FG_GREEN);
+    if(p) {
+        while(p) {
+            it start = p->lhs;  
+            it end = p->rhs; 
+            for(auto &e: cc) {
+                if(e.chr == start && start != end) {
+                    e.hit = true;
+                    start++;
+                }
+            } 
+            if(p->rhs == p->end) break;  
+            p->lhs = p->rhs;
+            p = parse_tree->eval(p);
+        }
+        for(auto e: cc) {
+            std::cout<<(e.hit? green : red)<< *e.chr;
+        }
+        return EXIT_SUCCESS;
+    }
+    for(auto e: cc) { 
+        std::cout<<(e.hit? green : red)<< *e.chr;
+    }
+    return EXIT_FAILURE; 
 }  
+ 
 int main(int argc, char** argv) { 
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "promise to (Love|Hate)\\I you"; 
+   
+    // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
+    //std::string input = "lo* could.{3}";  
+    //std::string input = "Waterloo";  
+     std::string input = "Waterloo (.*)the war\\O{1}"; 
+    //std::string input ="wa";
+    // std::string input = "promise to (Love|Hate) you\\O{1}"; 
+    // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
     it begin = input.begin();    
-    it end = input.end();   
+    it end = input.end();    
     op* result = program_parse(begin, end); 
     loop(result);  
-    exec(result, source);   
-    std::cout<<std::endl;  
-    int stop;
-    std::cin>>stop;  
-    return 0; 
-}    
-      
- 
-              
+    return execute(result, source);      
+}       
+        
+   
+                    

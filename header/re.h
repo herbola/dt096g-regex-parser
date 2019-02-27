@@ -6,7 +6,15 @@
 
 struct re : op {
     object *eval(object *o) override{
-        return operands[0]->eval(o);
+        o = operands[0]->eval(o);
+        if(o) {
+            if(o->captured > 0) {
+                o->lhs = o->cap[o->captured].lhs;
+                o->rhs = o->cap[o->captured].rhs;
+
+            }
+        }
+        return o;
     }
     std::string id() override{
         return "re";

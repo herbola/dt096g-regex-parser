@@ -6,9 +6,8 @@
 
 struct counter: op {
     object * eval(object *o) override {
-        int counter = atoi(operands[1]->id().c_str());
+        int counter = atoi(operands[1]->id().c_str()) + 1;
         for(; counter > 0; counter--) {
-            std::cout<<"counter: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<" COUNTER:"<<counter<<std::endl;
             object * temp = operands[0]->eval(o);
             if(!o) {
                 return nullptr;

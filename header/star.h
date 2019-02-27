@@ -6,13 +6,12 @@
 
 struct star : op {
     object *eval(object *o) override{
-        std::cout<<"star: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
         // quick fix .*
         if(!operands.empty()) {
             if(operands[0]->id() == "elementary_re") {
                 if(!operands[0]->operands.empty()) {
                     if(operands[0]->operands[0]->id() =="any"){    
-                        o->rhs = o->end - 1;
+                        o->rhs = o->end;
                         return o;
                     }
                 }
