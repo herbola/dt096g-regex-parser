@@ -11,7 +11,7 @@ struct star : op {
         if(!operands.empty()) {
             if(operands[0]->id() == "elementary_re") {
                 if(!operands[0]->operands.empty()) {
-                    if(operands[0]->operands[0]->id() =="any"){ 
+                    if(operands[0]->operands[0]->id() =="any"){    
                         o->rhs = o->end - 1;
                         return o;
                     }
@@ -21,7 +21,7 @@ struct star : op {
         object* elem = operands[0]->eval(o);
         if(elem) {
             char chr = *elem->rhs;
-            while(*(elem->rhs+1) == chr) {
+            while(*(elem->rhs) == chr) {
                 elem->rhs++;
             }
         } 

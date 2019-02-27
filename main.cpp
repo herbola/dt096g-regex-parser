@@ -20,7 +20,8 @@
 #include "header/lowercase.h"
 #include "header/capture.h"
 #include "header/object.h"
-
+#include "header/program.h"
+ 
 /*
 <RE> ::= <substitute>  |  <simple-RE>
 <substitute>	::=	<simple-RE>  "|" <RE>
@@ -51,6 +52,7 @@
 */
 
 using it = std::string::iterator;
+op* program_parse(it& first, it& last);
 op* regular_expression(it& first, it& last);
 op* substitute_expr(it& first, it& last);
 op* simple_re_expr(it& first , it& last);
@@ -260,10 +262,11 @@ op* lowercase_expr(it& first, it& last) {
         first = start;
         return nullptr;
     }
-    lowercase* expr = new lowercase;
+    first++;
+    lowercase* expr = new lowercase; 
     expr->operands.push_back(elem);
-    return expr;
-}
+    return expr; 
+} 
 
 op* capture_expr(it& first, it& last) {
     it start = first;
@@ -383,7 +386,6 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
     if(*first == *last) {
         return nullptr;
     }
-    token tk = next_token(first, last);
     op* sub_or_simple = substitute_expr(first, last);
     if(!sub_or_simple) {
         sub_or_simple = simple_re_expr(first, last);
@@ -392,6 +394,16 @@ op* regular_expression(it &first, it &last) { // <RE> ::= <substitute>  |  <simp
     expr->operands.push_back(sub_or_simple);
     return expr;
 } 
+
+op* program_parse(it &first, it &last) {
+    if(*first == *last) {
+        return nullptr;
+    }
+    op* re = regular_expression(first, last);
+    program * expr = new program;
+    expr->operands.push_back(re);
+    return expr;
+}
 void loop(op*& o, int i){
     i++;
     for(int j = 0; j < i; j++) { 
@@ -417,17 +429,17 @@ void exec(op* parse_tree, std::string source) {
 }  
 int main(int argc, char** argv) { 
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    std::string input = "o.*";
+    std::string input = "promise to (Love|Hate)\\I you"; 
     it begin = input.begin();    
     it end = input.end();   
-    op* result = regular_expression(begin, end); 
-    loop(result); 
-     exec(result, source);   
+    op* result = program_parse(begin, end); 
+    loop(result);  
+    exec(result, source);   
     std::cout<<std::endl;  
     int stop;
     std::cin>>stop;  
     return 0; 
-} 
+}    
+      
  
-
-           
+              

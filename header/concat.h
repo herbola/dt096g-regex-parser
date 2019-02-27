@@ -11,7 +11,6 @@ struct concat : op {
         if(basic) {
             print(id(),basic);
             std::cout<<"TEST: "<<"LHS:"<<*(basic->lhs)<<" RHS:"<<*(basic->rhs)<<std::endl;
-            basic->rhs++;
             std::cout<<"TEST: "<<"LHS:"<<*(basic->lhs)<<" RHS:"<<*(basic->rhs)<<std::endl;
             object * simple = operands[1]->eval(basic);
             if(simple) {

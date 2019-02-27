@@ -4,11 +4,15 @@
 #include "op.h"
 #include "object.h"
 
-
+using it = std::string::iterator;
 struct substitute : op {
     object *eval(object *o) override{
-        std::cout<<"sub: "<<"LHS:"<<*(o->lhs)<<" RHS:"<<*(o->rhs)<<std::endl;
-        return operands[0]->eval(o);
+        it start = o->rhs;
+        object * simple_re = operands[0]->eval(o);
+        if(!simple_re) {
+            simple_re = operands[1]->eval(o);
+        }
+        return simple_re;
     }
     std::string id() override{
         return "substitute";
