@@ -484,7 +484,7 @@ int main(int argc, char** argv) {
         std::getline(std::cin, choice);
         std::string input = "";
         for(int i = 0; i<regex.size(); i++) {
-            if(static_cast<int>(choice[0]) == i) {
+            if(static_cast<int>(choice[0] -'0') == i) {
                 input = regex[i];
             }
         }
