@@ -455,7 +455,7 @@ int execute(op* parse_tree, std::string source) {
 }     
       
 int main(int argc, char** argv) {  
-    Color::Modifier blue(Color::FG_BLUE),def(Color::FG_DEFAULT); 
+    Color::Modifier blue(Color::FG_TEXT),def(Color::FG_DEFAULT); 
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     //  std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
     // std::string input = "lo* could.{3}";    
@@ -466,7 +466,6 @@ int main(int argc, char** argv) {
     // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
     it begin = input.begin();    
     it end = input.end();    
-
     op* result = program_parse(begin, end); 
     loop(result);    
     std::cout<<"regex: ["<<blue<<input<<def<<"]\n";
