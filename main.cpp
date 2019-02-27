@@ -1,7 +1,11 @@
 #include <cstdlib>
 #include <iostream>
-#include "header/colormod.h"
+#include <stdlib.h> 
+#include <sstream>
+#include <conio.h>
 #include <string>
+#include "header/colormod.h"
+
 #include "header/op.h"
 #include "header/token.h"
 #include "header/re.h"
@@ -32,7 +36,7 @@
 <star>	::=	<elementary-RE> "*"
 <counter> ::= <elementary-Re>  "{" <digit> "}"
 <plus> ::= <elementary-RE> "+"
-<elementary-RE>	::=	<blank> | <char> | <group> | <any> 
+<elementary-RE>	::=	 <char> | <group> | <any> 
 <group>	::=	"(" <RE> ")"
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <any>	::=	"."
@@ -453,23 +457,54 @@ int execute(op* parse_tree, std::string source) {
     }
     return EXIT_FAILURE;  
 }     
-      
+void print_alternatives(std::vector<std::string> & vec) {
+    system("clear");
+    Color::Modifier test(Color::FG_TEST), purple(Color::FG_PURPLE),def(Color::FG_DEFAULT); 
+    std::cout<<purple<<"Choose regex "<<def<<std::endl;
+    int i = 0;
+    for(; i < vec.size(); i++) {
+        std::cout<<test<<i<<" "<<def<< vec[i]<< std::endl;
+    }
+    std::cout<<test<<i<<" "<<def<< "your own regular expression"<< std::endl;
+}  
 int main(int argc, char** argv) {  
-    Color::Modifier blue(Color::FG_TEXT),def(Color::FG_DEFAULT); 
+    Color::Modifier blue(Color::FG_PURPLE),purple(Color::FG_PURPLE), def(Color::FG_DEFAULT); 
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-    //  std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
-    // std::string input = "lo* could.{3}";    
-    //std::string input = "Waterloo";  
-    //std::string input = "Waterloo (.*)the war\\O{1}";  
-    std::string input ="(w|W).";  
-    // std::string input = "promise to (Love|Hate) you\\O{1}"; 
-    // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
-    it begin = input.begin();    
-    it end = input.end();    
-    op* result = program_parse(begin, end); 
-    loop(result);    
-    std::cout<<"regex: ["<<blue<<input<<def<<"]\n";
-    return execute(result, source);      
+    std::vector<std::string> regex ({
+        "promise to (Love|Hate)\\I you\\O{1}",
+        "lo* could.{3}",
+        "Waterloo (.*)the war\\O{1}",
+        "promise to (Love|Hate) you\\O{1}",
+        "promise to (Love|Hate)\\I you\\O{1}",
+        "(w|W).{3}"
+    });
+    while(true) {
+        print_alternatives(regex);
+        std::string choice;
+        std::getline(std::cin, choice);
+        std::string input = "";
+        for(int i = 0; i<regex.size(); i++) {
+            if(static_cast<int>(choice[0]) == i) {
+                input = regex[i];
+            }
+        }
+        if(input == "") {
+            system("clear");
+            std::cout<<"Enter your regex and press enter..\n";
+            std::getline(std::cin, input);
+        }
+        system("clear");
+        it begin = input.begin();    
+        it end = input.end();  
+        op* result = program_parse(begin, end);  
+        std::cout<<"regex: ["<<blue<<input<<def<<"]\n";
+        loop(result);
+        execute(result, source); 
+        std::cout<<purple<<"\n Hit key and enter to continue..\n"<<def; 
+        std::string cont;
+        std::getline(std::cin, cont);
+    }
+    return 0;
 }       
         
     
