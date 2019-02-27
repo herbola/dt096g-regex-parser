@@ -9,9 +9,10 @@ struct re : op {
         o = operands[0]->eval(o);
         if(o) {
             if(o->captured > 0) {
-                o->lhs = o->cap[o->captured].lhs;
-                o->rhs = o->cap[o->captured].rhs;
-
+                if(o->captured < o->cap.size()) {
+                    o->lhs = o->cap[o->captured].lhs;
+                     o->rhs = o->cap[o->captured].rhs;
+                } else return nullptr; // capture failed
             }
         }
         return o;

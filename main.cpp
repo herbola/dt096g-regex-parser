@@ -190,21 +190,17 @@ op* group_expr(it& first, it& last) {
 }
 op* elemtentary_re_expr(it& first, it& last) {
     it start = first;
-    // op* blank_char_group_any_counter = blank_expr(first, last);
-        op* blank_char_group_any_counter = nullptr;
-    if(!blank_char_group_any_counter){
-        blank_char_group_any_counter = char_expr(first ,last);
+     op * blank_char_group_any_counter = char_expr(first ,last);
+    if(!blank_char_group_any_counter) {
+        blank_char_group_any_counter = group_expr(first, last);
         if(!blank_char_group_any_counter) {
-            blank_char_group_any_counter = group_expr(first, last);
+            blank_char_group_any_counter = any_expr(first, last);
             if(!blank_char_group_any_counter) {
-                blank_char_group_any_counter = any_expr(first, last);
-                if(!blank_char_group_any_counter) {
-                    first = start;
-                    return nullptr;
-                }
+                first = start;
+                return nullptr;
             }
         }
-    }
+    }   
     elementary_re* expr = new elementary_re;
     expr->operands.push_back(blank_char_group_any_counter);
     return expr;
@@ -269,8 +265,8 @@ op* capture_expr(it& first, it& last) {
     tk = next_token(first, last);
     if(tk.text != "O") {
         first = start;
-        return nullptr;
-    }
+        return nullptr; 
+    } 
     first++;
     // 
     tk = next_token(first, last);
@@ -492,13 +488,14 @@ int main(int argc, char** argv) {
         if(input == "") {
             system("clear");
             system("CLS");
+            std::cout<<purple<<source<<def<<"\n";
             std::cout<<"Enter your regex and press enter..\n";
             std::getline(std::cin, input);
         }
-        system("clear");
+        system("clear"); 
         system("CLS");
         it begin = input.begin();    
-        it end = input.end();  
+        it end = input.end();   
         op* result = program_parse(begin, end);  
         std::cout<<"regex: ["<<blue<<input<<def<<"]\n";
         loop(result);
@@ -509,6 +506,6 @@ int main(int argc, char** argv) {
     }
     return 0;
 }       
-        
+         
     
                     
