@@ -6,7 +6,7 @@
 
 struct counter: op {
     object * eval(object *o) override {
-        int counter = atoi(operands[1]->id().c_str()) + 1;
+        int counter = atoi(operands[1]->id().c_str());
         for(; counter > 0; counter--) {
             object * temp = operands[0]->eval(o);
             if(!o) {

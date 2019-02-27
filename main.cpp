@@ -436,34 +436,40 @@ int execute(op* parse_tree, std::string source) {
             if(p->rhs == p->end) break;  
             p->lhs = p->rhs;
             p = parse_tree->eval(p);
+            if(p) {
+                if(end == p->rhs) { // quick fix, might fix later probably
+                    break;
+                }
+            }
+
         }
         for(auto e: cc) {
             std::cout<<(e.hit? green : red)<< *e.chr;
         }
-        return EXIT_SUCCESS;
+        return EXIT_SUCCESS; 
     }
     for(auto e: cc) { 
         std::cout<<(e.hit? green : red)<< *e.chr;
     }
-    return EXIT_FAILURE; 
-}  
- 
-int main(int argc, char** argv) { 
+    return EXIT_FAILURE;  
+}     
+      
+int main(int argc, char** argv) {   
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
-   
-    // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
-    //std::string input = "lo* could.{3}";  
+         
+    //  std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
+    // std::string input = "lo* could.{3}";    
     //std::string input = "Waterloo";  
-     std::string input = "Waterloo (.*)the war\\O{1}"; 
-    //std::string input ="wa";
+    std::string input = "Waterloo (.*)the war\\O{1}";  
+    //std::string input ="wa";  
     // std::string input = "promise to (Love|Hate) you\\O{1}"; 
     // std::string input = "promise to (Love|Hate)\\I you\\O{1}"; 
     it begin = input.begin();    
     it end = input.end();    
     op* result = program_parse(begin, end); 
-    loop(result);  
+    loop(result);    
     return execute(result, source);      
 }       
         
-   
+    
                     

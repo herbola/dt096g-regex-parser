@@ -14,16 +14,18 @@ struct concat : op {
             basic->lhs = basic->rhs;
             object * simple = operands[1]->eval(basic);
             bool backtrack = false;
-            while(basic_begin != --basic->rhs && !simple) {
+            for(;basic_begin != basic->rhs -1 && !simple; --basic->rhs, --basic->lhs) {
                 backtrack = true;
                 simple = operands[1]->eval(basic);
             }
             if(simple) {
                 if(backtrack) {
-                    simple->cap.push_back({o_begin, basic->rhs + 1});
+                    simple->cap.push_back({basic_begin, basic->rhs +1});
                     std::swap(simple->cap[simple->cap.size()-1], simple->cap[simple->cap.size()-2]);
+                    size_t size = 0;
+                    for(it i = simple->cap[simple->cap.size()-1].lhs; i != simple->cap[simple->cap.size()-1].rhs; i++, size++);
+                    simple->cap[simple->cap.size()-2].rhs -= size;
                 }
-                simple->rhs++;
                 simple->lhs = o_begin;
                 return simple;
             }

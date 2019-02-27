@@ -9,9 +9,7 @@ struct program : op {
     object *eval(object *o) override{
         while(o->rhs != o->end) {
             object * re = operands[0]->eval(o);
-            if(re) {
-                return re;
-            }
+            if(re) return re;
             o->lhs = ++o->rhs;
         }
         return nullptr;
