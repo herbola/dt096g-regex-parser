@@ -6,6 +6,26 @@ There is a few quickfixes issued to pointers
 c++ compiler required.
 run Make in cmd 
 and run file output.exe
+
+## Grammar
+```
+<RE> ::= <substitute>  |  <simple-RE>
+<substitute>	::=	<simple-RE>  "|" <RE>
+<simple-RE>	::=  concatenation> | <basic-RE> 
+<concatenation> ::= <basic-RE> <simple-RE> 
+<basic-RE>	::= <star> | <plus> | <counter> | <lowercase> | <capture> | <elementary-RE>
+<capture> ::= <elementary-RE> "\O" <counter>
+<lowercase> ::= <elementary-RE> "\I"
+<star>	::=	<elementary-RE> "*"
+<counter> ::= <elementary-Re>  "{" <digit> "}"
+<elementary-RE>	::=	 <char> | <group> | <any> 
+<group>	::=	"(" <RE> ")"
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<any>	::=	"."
+<charachter>	::= <char>
+ ```
 ### Output
-![1](https://user-images.githubusercontent.com/43444902/53498230-3930ea80-3aa6-11e9-8b25-2a6b9c3daa0f.PNG)
-![2](https://user-images.githubusercontent.com/43444902/53498235-3afaae00-3aa6-11e9-9941-c03260cb8589.PNG)
+
+![1](https://user-images.githubusercontent.com/43444902/53501921-51f0ce80-3aad-11e9-983e-a042ade41a46.PNG)
+![2](https://user-images.githubusercontent.com/43444902/53501922-52896500-3aad-11e9-92f2-63b48aace06a.PNG)
+
