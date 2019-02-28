@@ -24,7 +24,7 @@
 #include "header/capture.h"
 #include "header/object.h"
 #include "header/program.h"
- 
+   
 /*
 <RE> ::= <substitute>  |  <simple-RE>
 <substitute>	::=	<simple-RE>  "|" <RE>
@@ -35,13 +35,12 @@
 <lowercase> ::= <elementary-RE> "\I"
 <star>	::=	<elementary-RE> "*"
 <counter> ::= <elementary-Re>  "{" <digit> "}"
-<plus> ::= <elementary-RE> "+"
 <elementary-RE>	::=	 <char> | <group> | <any> 
 <group>	::=	"(" <RE> ")"
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <any>	::=	"."
 <charachter>	::= <char>
-*/
+*/ 
 
 
 /*
@@ -49,7 +48,7 @@
 * flera, passar ett eller flera upprepningar av en operand. Syntax: OP*
 () infångningsgrupp, deluttryck. Uttrycket parsas separat. Syntax: (EXPR)
 . tecken. matchar varlfritt tecken. Syntax: .
-{} räknare. matchar precis N stycken operander. Syntax: OP{3}
+{} räknare. matchar precis N stycken operander. Syntax: OP{3} 
 \I ignorera versalisering. Syntax EXPR\I
 \O{} vilken infångningsgrupp som ska ges som output. Syntax: EXPR\O{2}. Default \O{0} hela matchningen.
 */
@@ -405,10 +404,10 @@ void loop(op*& o, int i){
     std::cout<<o->id()<<std::endl; 
     for(auto e : o->operands) {
         loop(e, i);
-    }
+    } 
 }
 
-struct color_char{
+struct color_char{ 
     it chr;
     bool hit;
 };
@@ -431,8 +430,8 @@ int execute(op* parse_tree, std::string source) {
                 if(e.chr == start && start != end) {
                     e.hit = true;
                     start++;
-                }
-            } 
+                } 
+            }  
             if(p->rhs == p->end) break;  
             p->lhs = p->rhs;
             p = parse_tree->eval(p);
@@ -463,28 +462,29 @@ void print_alternatives(std::vector<std::string> & vec) {
         std::cout<<test<<i<<" "<<def<< vec[i]<< std::endl;
     }
     std::cout<<test<<i<<" "<<def<< "your own regular expression"<< std::endl;
-}  
+}      
 int main(int argc, char** argv) {  
     Color::Modifier blue(Color::FG_PURPLE),purple(Color::FG_PURPLE), def(Color::FG_DEFAULT); 
     std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::vector<std::string> regex ({
         "promise to (Love|Hate)\\I you\\O{1}",
-        "lo* could.{3}",
+        "lo* could.{3}",   
         "Waterloo (.*)the war\\O{1}",
-        "promise to (Love|Hate) you\\O{1}",
+        "promise to (Love|Hate) you\\O{1}", 
         "promise to (Love|Hate)\\I you\\O{1}",
-        "(w|W).{3}"
-    });
+        "(w|W).{3}",
+        "Waterloo(.*)w" 
+    });   
     while(true) {
         print_alternatives(regex);
         std::string choice;
         std::getline(std::cin, choice);
         std::string input = "";
         for(int i = 0; i<regex.size(); i++) {
-            if(static_cast<int>(choice[0] -'0') == i) {
+            if(static_cast<int>(choice[0] -'0') == i) { 
                 input = regex[i];
             }
-        }
+        } 
         if(input == "") {
             system("clear");
             system("CLS");

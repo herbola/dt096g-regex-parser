@@ -14,8 +14,12 @@ struct concat : op {
             basic->lhs = basic->rhs;
             object * simple = operands[1]->eval(basic);
             bool backtrack = false;
-            for(;basic_begin != basic->rhs -1 && !simple; --basic->rhs, --basic->lhs) {
+
+            for(;basic_begin != basic->rhs && !simple; --basic->rhs, --basic->lhs) {
                 backtrack = true;
+                if(basic_begin == basic->rhs) {
+                    return nullptr;
+                }
                 simple = operands[1]->eval(basic);
             }
             if(simple) {
