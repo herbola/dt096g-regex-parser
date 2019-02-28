@@ -1,4 +1,4 @@
-# DT096G-Parsing-Labb1
+# Regular Expression Parser
 
 Edit the input file and the source file
 There is a few quickfixes issued to pointers
