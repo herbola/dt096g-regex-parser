@@ -404,10 +404,10 @@ void loop(op*& o, int i){
     std::cout<<o->id()<<std::endl; 
     for(auto e : o->operands) {
         loop(e, i);
-    }
+    } 
 }
 
-struct color_char{
+struct color_char{ 
     it chr;
     bool hit;
 };
