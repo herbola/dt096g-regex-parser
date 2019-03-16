@@ -31,6 +31,8 @@ struct concat : op {
                     simple->cap[simple->cap.size()-2].rhs -= size;
                 }
                 simple->lhs = o_begin;
+                
+                std::cout<<"\n";    
                 return simple;
             }
         }

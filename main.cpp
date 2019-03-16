@@ -431,7 +431,7 @@ int execute(op* parse_tree, std::string source) {
                     e.hit = true;
                     start++;
                 } 
-            }  
+            } 
             if(p->rhs == p->end) break;  
             p->lhs = p->rhs;
             p = parse_tree->eval(p);
@@ -440,7 +440,7 @@ int execute(op* parse_tree, std::string source) {
                     break;
                 }
             }
-
+ 
         }
         for(auto e: cc) {
             std::cout<<(e.hit? green : red)<< *e.chr;
@@ -465,9 +465,9 @@ void print_alternatives(std::vector<std::string> & vec) {
 }      
 int main(int argc, char** argv) {  
     Color::Modifier blue(Color::FG_PURPLE),purple(Color::FG_PURPLE), def(Color::FG_DEFAULT); 
-    std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterloo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
+    std::string source = "Waterloo I was defeated, you won the war Waterloo promise to love you for ever more Waterlooo couldn't escape if I wanted to Waterloo knowing my fate is to be with you Waterloo finally facing my Waterloo";
     std::vector<std::string> regex ({
-        "promise to (Love|Hate)\\I you\\O{1}",
+        "promise to (Love|Hate)\\I you\\O{1}", 
         "lo* could.{3}",   
         "Waterloo (.*)the war\\O{1}",
         "promise to (Love|Hate) you\\O{1}", 
